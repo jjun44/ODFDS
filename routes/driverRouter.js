@@ -8,11 +8,7 @@
 
 var express = require('express');
 var router = express.Router();
-var path = require('path');
-var app = express();
 //const driverCtrl = require("../controllers/driverCtrl");
-
-app.use(express.static(path.join(__dirname, 'public')));
 
 /* Get delivery page */
 router.get('/delivery', function(req, res, next) {
