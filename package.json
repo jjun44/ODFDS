@@ -1,5 +1,5 @@
 {
-  "name": "odfds_v2",
+  "name": "odfds",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -14,20 +14,21 @@
     "http-errors": "~1.6.2",
     "jade": "~1.11.0",
     "morgan": "~1.9.0",
+    "mysql": "^2.16.0",
     "swig": "^1.4.2"
   },
   "description": "On-Demand Food Delivery Service System",
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jaehoJun/ODFDS-Santa-Clara.git"
+    "url": "git+https://github.com/jaehoJun/ODFDS.git"
   },
   "author": "Jaeho Jun, Aldrich Reboja, Dev Patel, Yinjie Liu, Han Qiu",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jaehoJun/ODFDS-Santa-Clara/issues"
+    "url": "https://github.com/jaehoJun/ODFDS/issues"
   },
-  "homepage": "https://github.com/jaehoJun/ODFDS-Santa-Clara#readme",
+  "homepage": "https://github.com/jaehoJun/ODFDS#readme",
   "devDependencies": {
     "nodemon": "^1.18.10"
   }
