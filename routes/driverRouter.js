@@ -8,7 +8,7 @@
 
 var express = require('express');
 var router = express.Router();
-//const driverCtrl = require("../controllers/driverCtrl");
+const driverCtrl = require("../controllers/driverCtrl");
 
 /* Get delivery page */
 router.get('/delivery', function(req, res, next) {
@@ -18,5 +18,7 @@ router.get('/delivery', function(req, res, next) {
 router.get('/deliveryInfo', function(req, res, next) {
 	res.render('deliverInfo');
 });
+/* Post delivery info page */
+router.post('/deliveryInfo', driverCtrl.getDeliveryInfo);
 
 module.exports = router;
