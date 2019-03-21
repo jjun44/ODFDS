@@ -14,7 +14,7 @@ module.exports.getDeliveryInfo = function (req, res) {
   const orderId = req.body.orderId;
   const sql = 'select d.orderId, Name, Address, Destination, timeLeft, distanceLeft \
               from Restaurant r, Delivery d, DeliveryStatus ds \
-              where d.orderId = 10101 and d.rId = r.rId and d.orderId = ds.orderId;'
+              where d.orderId = ? and d.rId = r.rId and d.orderId = ds.orderId;'
   const value = [orderId]
   conn.query(sql, value, function (err, result) {
     if (err) { console.log("Couldn't find!"); }
