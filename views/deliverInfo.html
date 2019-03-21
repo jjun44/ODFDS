@@ -44,7 +44,7 @@
                 <br> <br>
                 <div class="wrap-input100 validate-input" data-validate="Order ID is required">
                     <span class="label-input100">Check Order:</span>
-                    <input class="input100" type="text" name="destination" placeholder="Enter the order ID...">
+                    <input class="input100" type="text" name="orderId" placeholder="Enter the order ID...">
                     <span class="focus-input100"></span>
                 </div>
 
@@ -59,15 +59,15 @@
             </form>
             <br>
             <div class="jumbotron">
-                <h3 class="display-6">Order ID: </h3>
-                <p class="lead">Restaurant Name:</p>
-                <p class="lead">Restaurant Address:</p>
-                <p class="lead">Destination:</p>
-                <p class="lead">Estimated Time Left:</p>
-                <p class="lead">Distance Left:</p>
+		    <h3 class="display-6">Order ID: {{orderId}} </h3>
+                <p class="lead">Restaurant Name: {{rName}}</p>
+                <p class="lead">Restaurant Address: {{rAddr}}</p>
+                <p class="lead">Destination: {{dest}}</p>
+                <p class="lead">Estimated Time Left: {{timeLeft}}</p>
+                <p class="lead">Distance Left: {{distanceLeft}}</p>
 
                 <hr class="my-4">
-               
+
 
             </div>
 
