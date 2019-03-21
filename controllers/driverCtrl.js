@@ -9,6 +9,22 @@
 
 const conn = require('./dbCtrl'); // Connection to the database.
 
+/** Gets delivery information by the oder ID. */
+module.exports.getDeliveryInfo = function (req, res) {
+  const orderId = req.body.orderId;
+  const sql = 'select d.orderId, Name, Address, Destination, timeLeft, distanceLeft \
+              from Restaurant r, Delivery d, DeliveryStatus ds \
+              where d.orderId = 10101 and d.rId = r.rId and d.orderId = ds.orderId;'
+  const value = [orderId]
+  conn.query(sql, value, function (err, result) {
+    if (err) { console.log("Couldn't find!"); }
+    console.log(result, '\n', result.orderId);
+    res.render('deliverInfo', {'orderId': result[0].orderId,
+                               'rName': result[0].Name, 'rAddr': result[0].Address,
+                               'dest': result[0].Destination, 'timeLeft': result[0].timeLeft,
+                               'distanceLeft': result[0].distanceLeft});
+  })
+}
 /** Adds driver user infomration to User/Driver tables. */
 module.exports.addUser = function (req, res) {
   // Get user information from the driver signup page.
