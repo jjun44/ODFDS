@@ -38,6 +38,8 @@ module.exports.addUser = function (req, res) {
   // Insert data into tables;
   var sql, value;
   addUserInfo();
+
+
   /**
    * Insert user infomration into User table.
    */
