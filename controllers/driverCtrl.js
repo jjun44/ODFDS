@@ -30,6 +30,11 @@ module.exports.addUser = function (req, res) {
   // Get user information from the driver signup page.
   const email = req.body.email;
   const pwd = req.body.pwd;
+
+  // Added a repeat password variable to check if the passwords match
+  const rPwd = req.body.repeatpwd;
+
+
   const name = req.body.name;
   const license  = req.body.dl;
   const phone  = req.body.phone;
@@ -37,7 +42,64 @@ module.exports.addUser = function (req, res) {
   const working = 0;
   // Insert data into tables;
   var sql, value;
-  addUserInfo();
+
+  validateSignUp();
+  //addUserInfo();
+
+
+  /*
+    This function will be responsible for validating each input field of the page.
+  */
+  function validateSignUp() {
+    console.log("Validating..... \n");
+
+    // Initialize variables for the error messages
+    var emailMess = "";
+    var passMess = "";
+    var nameMess = "";
+    var licenseMess ="";
+    var phoneMess ="";
+    var bankMess = "";
+    var error = false;
+
+    // Check if any of the fields are empty when the button is pressed.
+    if (email.length == 0) {
+      console.log("Email field is empty");
+      emailMess = "* Enter an Email";
+      error = true;
+      //res.render('driverSignup', {errorEmail: "Enter an Email"});
+    }
+
+    // Check if the password is too short or if it doesn't match the original.
+    if (pwd.length == 0 || pwd.length <4) {
+      console.log("Password too short");
+      passMess = "* Password too short";
+      error = true;
+    }
+    else if (pwd !== repeatpwd) {
+      console.log("Passwords dont match \n");
+      passMess = "Passwords don't match";
+      error = true;
+    }
+
+    // Name checking.
+    if (name.length == 0) {
+      console.log("Name Field is empty.");
+      nameMess = "* Enter Name here";
+      error = true;
+    }
+
+    if (license.length == 0) {
+      console.log("license field is empty. \n");
+      licenseMess = "* Missing";
+      error = true;
+    }
+    
+    if (error == true) {
+    res.render('driverSignup', {errorEmail: emailMess, errorPassword: passMess, errorName: nameMess ,
+     errorLicense: licenseMess});
+  }
+  }
 
 
   /**

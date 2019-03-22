@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="en">
 <head>
     <title>Driver Signup</title>
@@ -31,6 +31,32 @@
 </head>
 <body style="background-color: #999999;">
 
+
+    <style>     
+
+        @keyframes transparent {
+    from {opacity: 1}
+    to {opacity: 0}
+}
+
+
+        .eM {
+    font-size: 11px; 
+    background-color: rgba(255,0,0, 0.2);
+    color: rgb(255,0,0);
+    text-align: center;
+    border-radius: 15px;
+    width: auto;
+    display: inline-block;
+    height: fit-content;
+    margin-right: 7%;
+    animation-name: transparent;
+    animation-delay: 2s;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+}
+    </style>
+
 <div class="limiter">
     <div class="container-login100">
         <div class="login100-more" style="background-image: url('images/SignUpPage.jpg');"></div>
@@ -41,32 +67,59 @@
 						Driver Sign Up
 					</span>
                 <div class="wrap-input50 validate-input" data-validate="Username is required">
-                    <span class="label-input100">Email Address</span>
+                    <span class="label-input100">Email Address </span>
+
+                    <div class = "eM">
+                        <!-- Dynamic variable for error message.  -->
+                        {{errorEmail}}
+                    </div>
 
                     <input class="input50" type="text" name="email" placeholder="Username...">
                     <span class="focus-input100"></span>
                 </div>
 
+                 
+
                 <div class="wrap-input50 validate-input" data-validate = "Password is required">
-                    <span class="label-input100">Password</span>
+                    <span class="label-input100">Password
+                    </span>
+                     <span class = "eM">
+                        <!-- Dynamic variable for error message.  -->
+                        {{errorPassword}}
+                    </span>
                     <input class="input50" type="text" name="pwd" placeholder="*************">
                     <span class="focus-input100"></span>
                 </div>
 
                 <div class="wrap-input50 validate-input" data-validate = "Repeat Password is required">
                     <span class="label-input100">Repeat Password</span>
-                    <input class="input50" type="text" name="repeat-pwd" placeholder="*************">
+
+
+                    <input class="input50" type="text" name="repeatpwd" placeholder="*************">
                     <span class="focus-input100"></span>
                 </div>
                 <div class="wrap-input50 validate-input" data-validate="Name is required">
-                    <span class="label-input100">Name</span>
+                    <span class="label-input100">Name
+
+                        <div class = "eM">
+                        <!-- Dynamic variable for error message.  -->
+                        {{errorName}}
+                    </div>
+
+                    </span>
                     <br>
                     <input class="input50" type="text" name="name" placeholder="Name...">
                     <span class="focus-input100"></span>
                 </div>
 
                 <div class="wrap-input50 validate-input" data-validate = "Driver's Licence is required">
-                    <span class="label-input100">Driver's Licence</span>
+                    <span class="label-input100">Driver's License
+                        <div class = "eM">
+                        <!-- Dynamic variable for error message.  -->
+                        {{errorLicense}}
+                    </div>
+
+                    </span>
                     <br>
                     <input class="input50" type="text" name="dl" placeholder="Driver's Licence...">
                     <span class="focus-input100"></span>
