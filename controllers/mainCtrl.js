@@ -23,7 +23,14 @@ module.exports.login = function (req, res) {
     const value = [email, pwd];
     conn.query(sql, value, function (err, result) {
         if (err) { console.log('Login Connection Failed'); }
-        if (result.length <= 0) { console.log('No user found'); }
+        if (result.length <= 0) { 
+
+          // Log for terminal.
+          console.log('No user found'); 
+
+          //Render the page but with the error message.
+          res.render('index', {errorMessage: 'Invalid Login, Try again.'})
+        }
         else {
           console.log('Login validation success');
           // Compare type to rend a corresponding page.
