@@ -29,4 +29,7 @@
     "url": "https://github.com/jjun44/ODFDS/issues"
   },
   "homepage": "https://github.com/jjun44/ODFDS#readme"
+  "devDependencies": {	
+    "nodemon": "^1.18.10"	
+  }
 }
