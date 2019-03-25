@@ -21,15 +21,12 @@
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jaehoJun/ODFDS.git"
+    "url": "git+https://github.com/jjun44/ODFDS.git"
   },
   "author": "Jaeho Jun, Aldrich Reboja, Dev Patel, Yinjie Liu, Han Qiu",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jaehoJun/ODFDS/issues"
+    "url": "https://github.com/jjun44/ODFDS/issues"
   },
-  "homepage": "https://github.com/jaehoJun/ODFDS#readme",
-  "devDependencies": {
-    "nodemon": "^1.18.10"
-  }
+  "homepage": "https://github.com/jjun44/ODFDS#readme"
 }
