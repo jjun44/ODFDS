@@ -1,35 +1,34 @@
 {
   "name": "odfds",
-  "version": "0.0.0",
-  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
   "scripts": {
     "start": "node ./bin/www",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "devstart": "nodemon ./bin/www"
   },
-  "dependencies": {
-    "consolidate": "^0.15.1",
-    "cookie-parser": "~1.4.3",
-    "debug": "~2.6.9",
-    "express": "~4.16.0",
-    "http-errors": "~1.6.2",
-    "jade": "~1.11.0",
-    "morgan": "~1.9.0",
-    "mysql": "^2.16.0",
-    "swig": "^1.4.2"
-  },
-  "description": "On-Demand Food Delivery Service System",
-  "main": "app.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jjun44/ODFDS.git"
   },
-  "author": "Jaeho Jun, Aldrich Reboja, Dev Patel, Yinjie Liu, Han Qiu",
+  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/jjun44/ODFDS/issues"
   },
-  "homepage": "https://github.com/jjun44/ODFDS#readme"
-  "devDependencies": {	
-    "nodemon": "^1.18.10"	
+  "homepage": "https://github.com/jjun44/ODFDS#readme",
+  "dependencies": {
+    "consolidate": "^0.15.1",
+    "cookie-parser": "^1.4.4",
+    "debug": "^4.1.1",
+    "express": "^4.16.4",
+    "http-errors": "^1.7.2",
+    "morgan": "^1.9.1",
+    "mysql": "^2.16.0",
+    "swig": "^1.4.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.10"
   }
 }
