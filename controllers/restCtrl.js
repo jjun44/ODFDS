@@ -13,15 +13,15 @@ const conn = require('./dbCtrl'); // Connection to the database.
 module.exports.getTrackInfo = function (req, res) {
   const orderId = req.body.orderId;
   const sql = 'select d.orderId, currentLocation, Destination, distanceLeft, \
-               timeLeft, price from Delivery d, DeliveryStatus ds,Price p \
-               where d.orderId = ? and d.orderId = ds.orderId and \
+               timePassed, timeLeft, price from Delivery d, DeliveryStatus ds, \
+               Price p where d.orderId = ? and d.orderId = ds.orderId and \
                d.orderId = p.orderId;'
   const value = [orderId]
   conn.query(sql, value, function (err, result) {
     if (err) { console.log("Couldn't find!"); }
     res.render('trackPage', {'orderId': result[0].orderId,
-                               'destination': result[0].destination,
                                'disLeft': result[0].distanceLeft,
+                               'timePassed': result[0].timePassed,
                                'timeLeft': result[0].timeLeft,
                                'price': result[0].price});
   })
