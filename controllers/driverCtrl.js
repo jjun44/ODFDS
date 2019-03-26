@@ -12,9 +12,10 @@ const conn = require('./dbCtrl'); // Connection to the database.
 /** Gets delivery information by the oder ID. */
 module.exports.getDeliveryInfo = function (req, res) {
   const orderId = req.body.orderId;
-  const sql = 'select d.orderId, Name, Address, Destination, timeLeft, distanceLeft \
-              from Restaurant r, Delivery d, DeliveryStatus ds \
-              where d.orderId = ? and d.rId = r.rId and d.orderId = ds.orderId;'
+  const sql = 'select d.orderId, Name, Address, Destination, timeLeft, \
+               distanceLeft, price from Restaurant r, Delivery d, \
+               DeliveryStatus ds, Price p where d.orderId = ? and d.rId = r.rId \
+               and d.orderId = ds.orderId and d.orderId = p.orderId'
   const value = [orderId]
   conn.query(sql, value, function (err, result) {
     if (err) { console.log("Couldn't find!"); }
@@ -22,9 +23,11 @@ module.exports.getDeliveryInfo = function (req, res) {
     res.render('deliverInfo', {'orderId': result[0].orderId,
                                'rName': result[0].Name, 'rAddr': result[0].Address,
                                'dest': result[0].Destination, 'timeLeft': result[0].timeLeft,
-                               'distanceLeft': result[0].distanceLeft});
+                               'distanceLeft': result[0].distanceLeft,
+                               'price': result[0].price});
   })
 }
+
 /** Adds driver user infomration to User/Driver tables. */
 module.exports.addUser = function (req, res) {
   // Get user information from the driver signup page.
@@ -45,7 +48,6 @@ module.exports.addUser = function (req, res) {
 
   validateSignUp();
   //addUserInfo();
-
 
   /*
     This function will be responsible for validating each input field of the page.
@@ -94,13 +96,12 @@ module.exports.addUser = function (req, res) {
       licenseMess = "* Missing";
       error = true;
     }
-    
+
     if (error == true) {
     res.render('driverSignup', {errorEmail: emailMess, errorPassword: passMess, errorName: nameMess ,
      errorLicense: licenseMess});
+    }
   }
-  }
-
 
   /**
    * Insert user infomration into User table.

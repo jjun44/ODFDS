@@ -9,6 +9,24 @@
 
 const conn = require('./dbCtrl'); // Connection to the database.
 
+/** Gets tracking information by the oder ID. */
+module.exports.getTrackInfo = function (req, res) {
+  const orderId = req.body.orderId;
+  const sql = 'select d.orderId, currentLocation, Destination, distanceLeft, \
+               timeLeft, price from Delivery d, DeliveryStatus ds,Price p \
+               where d.orderId = ? and d.orderId = ds.orderId and \
+               d.orderId = p.orderId;'
+  const value = [orderId]
+  conn.query(sql, value, function (err, result) {
+    if (err) { console.log("Couldn't find!"); }
+    res.render('trackPage', {'orderId': result[0].orderId,
+                               'destination': result[0].destination,
+                               'disLeft': result[0].distanceLeft,
+                               'timeLeft': result[0].timeLeft,
+                               'price': result[0].price});
+  })
+}
+
 /** Adds restauraunt user infomration to User/Location/Restaurant tables. */
 module.exports.addUser = function (req, res) {
   // Get user information from the restuarnt signup page.
