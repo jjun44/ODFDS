@@ -4,9 +4,8 @@
 <html lang="en">
 <head>
     <title>Restaurant Request</title>
-    <meta name="viewport" content="initial-scale=1.0">
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
     <!--===============================================================================================-->
     <link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
     <!--===============================================================================================-->
@@ -36,7 +35,7 @@
          * element that contains the map. */
         #map {
             height: 100%;
-            width: 67%
+            width: 100%
         }
         /* Optional: Makes the sample page fill the window. */
         html, body {
@@ -44,53 +43,102 @@
             margin: 0;
             padding: 0;
         }
+        body {
+            font-family: Arial;
+            color: white;
+        }
+
+        .split {
+            height: 100%;
+            width:50%;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            overflow-x: hidden;
+            padding-top: 0px;
+        }
+
+        .left {
+            left: 0;
+            background-color: #111;
+        }
+
+        .right {
+            right: 0;
+            background-color: white;
+        }
+
+        .centered {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .centered img {
+            width: 150px;
+            border-radius: 50%;
+        }
+
     </style>
 </head>
 <body style="background-color: #999999;">
 
-<div class="limiter">
-    <div class="container-login100">
-        <div id="map"></div>
-        <script>
-	 function initMap() {
-                var location = {lat: -25.363, lng: 131.044};
-                var map = new google.maps.Map(document.getElementById('map'), {
-                    center: {{location}},
-                    zoom: 8
-                });
-                var marker = new google.maps.Marker({
-                    position:  {{location}},
-                    map: map
-                })
-            }
-        </script>
-        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAM3QPegQOzvvzwKQjL9CuaUsVWj8L69Jw&callback=initMap"
-                async defer></script>
+<div class="split left">
 
-        <div class="wrap-login100 p-l-60 p-r-50 p-t-32 p-b-50">
-            <form class="login100-form validate-form" method="post">
+    <div id="map"></div>
+    <script>
+        var map;
+        function initMap() {
+            var location = {lat: -25.363, lng: 131.044};
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: location,
+                zoom: 8
+            });
+            var marker = new google.maps.Marker({
+                position: location,
+                map: map
+            })
+        }
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAM3QPegQOzvvzwKQjL9CuaUsVWj8L69Jw&callback=initMap"></script>
+
+</div>
+
+
+<div class="split right">
+    <div class="centered">
+        <form class="login100-form validate-form" method="post">
 					<span class="login100-form-title p-b-20">
 						Request a Driver
 					</span>
-                <br><br><br><br><br>
-                <div class="wrap-input100 validate-input" data-validate="Destination is required">
-                    <span class="label-input100">Enter the Destination</span>
-                    <input class="input100" type="text" name="destination" placeholder="Destination...">
-                    <span class="focus-input100"></span>
-                </div>
+            <br><br><br>
 
-                <div class="container-login100-form-btn">
-                    <div class="wrap-login100-form-btn">
-                        <div class="login100-form-bgbtn"></div>
-                        <button class="login100-form-btn">
-                            Request
-                        </button>
-                    </div>
+
+            <div class="wrap-input100 validate-input" data-validate="Destination is required">
+                <span class="login50-form-title p-b-30">Enter the Destination</span>
+                <input class="input100" type="text" name="destination" placeholder="Destination...">
+                <span class="focus-input100"></span>
+            </div>
+
+            <div class="container-login100-form-btn">
+                <div class="wrap-login100-form-btn">
+                    <div class="login100-form-bgbtn"></div>
+                    <button class="login100-form-btn">
+                        Request
+                    </button>
                 </div>
-            </form>
-        </div>
+            </div>
+        </form>
     </div>
 </div>
+
+
+
+
+
+
 
 <!--===============================================================================================-->
 <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
