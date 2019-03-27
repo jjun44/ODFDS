@@ -41,7 +41,7 @@
 
 
         .eM {
-    font-size: 11px; 
+    font-size: 14px; 
     background-color: rgba(255,0,0, 0.2);
     color: rgb(255,0,0);
     text-align: center;
@@ -65,14 +65,24 @@
             <form class="login100-form validate-form" method="post">
 					<span class="login100-form-title p-b-20">
 						Driver Sign Up
+
+
+                         <div class = "eM">
+                        <!-- Dynamic variable for error message.  -->
+                        {{errorM}}
+                    </div>
+
 					</span>
                 <div class="wrap-input50 validate-input" data-validate="Username is required">
-                    <span class="label-input100">Email Address </span>
+                    <span class="label-input100">Email Address
 
-                    <div class = "eM">
+                        <div class = "eM">
                         <!-- Dynamic variable for error message.  -->
                         {{errorEmail}}
                     </div>
+
+                     </span>
+                    
 
                     <input class="input50" type="text" name="email" placeholder="Username...">
                     <span class="focus-input100"></span>

@@ -31,6 +31,28 @@
 </head>
 <body style="background-color: #999999;">
 
+	    <style>     
+        @keyframes transparent {
+    from {opacity: 1}
+    to {opacity: 0}
+}
+        .eM {
+    font-size: 14px; 
+    background-color: rgba(255,0,0, 0.2);
+    color: rgb(255,0,0);
+    text-align: center;
+    border-radius: 15px;
+    width: auto;
+    display: inline-block;
+    height: fit-content;
+    margin-right: 7%;
+    animation-name: transparent;
+    animation-delay: 2s;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+}
+    </style>
+
 	<div class="limiter">
 		<div class="container-login100">
 			<div class="login100-more" style="background-image: url('images/SignUpPage.jpg');"></div>
@@ -39,10 +61,23 @@
 				<form class="login100-form validate-form" method="post">
 					<span class="login100-form-title p-b-20">
 						Restaurant Sign Up
+
+						<div class = "eM">
+                        <!-- Dynamic variable for error message.  -->
+                        {{errorM}}
+                    </div>
+
 					</span>
 
 					<div class="wrap-input50 validate-input" data-validate="Username is required">
-						<span class="label-input100">Email Address</span>
+						<span class="label-input100">Email Address
+
+							 <div class = "eM">
+                        <!-- Dynamic variable for error message.  -->
+                        {{errorEmail}}
+                    </div>
+
+						</span>
 
 						<input class="input50" type="text" name="email" placeholder="Username...">
 						<span class="focus-input100"></span>
@@ -56,7 +91,7 @@
 
 					<div class="wrap-input50 validate-input" data-validate = "Repeat Password is required">
 						<span class="label-input100">Repeat Password</span>
-						<input class="input50" type="text" name="repeat-pwd" placeholder="*************">
+						<input class="input50" type="text" name="repeatpwd" placeholder="*************">
 						<span class="focus-input100"></span>
 					</div>
 

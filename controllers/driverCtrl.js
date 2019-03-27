@@ -45,9 +45,11 @@ module.exports.addUser = function (req, res) {
   const working = 0;
   // Insert data into tables;
   var sql, value;
+  var error = false;
+  var mEmail = false;
 
   validateSignUp();
-  //addUserInfo();
+
 
   /*
     This function will be responsible for validating each input field of the page.
@@ -55,51 +57,49 @@ module.exports.addUser = function (req, res) {
   function validateSignUp() {
     console.log("Validating..... \n");
 
-    // Initialize variables for the error messages
     var emailMess = "";
     var passMess = "";
-    var nameMess = "";
-    var licenseMess ="";
-    var phoneMess ="";
-    var bankMess = "";
-    var error = false;
+    var dup = "";
 
-    // Check if any of the fields are empty when the button is pressed.
-    if (email.length == 0) {
-      console.log("Email field is empty");
-      emailMess = "* Enter an Email";
-      error = true;
-      //res.render('driverSignup', {errorEmail: "Enter an Email"});
-    }
+    
+    // If any of the fields are null, return an error message.
+    if ((email.length == 0 || !email.includes("@") || !email.includes(".com")) || (pwd.length == 0 || pwd != rPwd) || name.length ==0 ||
+    	license.length ==0 || (phone.length == 0 || phone.length != 10) || (bank.length == 0 || bank.length != 16)) 
+    {
+    	if (pwd.length < 4) {
+    		passMess = "Password must be at least 4 characters";
 
-    // Check if the password is too short or if it doesn't match the original.
-    if (pwd.length == 0 || pwd.length <4) {
-      console.log("Password too short");
-      passMess = "* Password too short";
-      error = true;
-    }
-    else if (pwd !== repeatpwd) {
-      console.log("Passwords dont match \n");
-      passMess = "Passwords don't match";
-      error = true;
-    }
+    	}
+    	else if (pwd != rPwd) {passMess ="Passwords don't match";}
+    	error = true;
+    	console.log("Missing Sign up information");
+    	emailMess = "** Invalid information.  "
+    } 
 
-    // Name checking.
-    if (name.length == 0) {
-      console.log("Name Field is empty.");
-      nameMess = "* Enter Name here";
-      error = true;
-    }
+    // Query for checking if the email already exists
+    const eQuery = 'Select Email from User \
+    				where Email = ?'
 
-    if (license.length == 0) {
-      console.log("license field is empty. \n");
-      licenseMess = "* Missing";
-      error = true;
-    }
+    const val = [email]
+    conn.query(eQuery, val, function(err, result) {
+    	if (err) {console.log("Error finding email");}
+    	else if (result.length != 0) {
+    		dup = "* Already Exists ";
+    		console.log("Email Already Exists \n");
+    		error = true;
+    	}
+    	else {
+    		console.log("Email is good");
+    	}
+    })
 
     if (error == true) {
-    res.render('driverSignup', {errorEmail: emailMess, errorPassword: passMess, errorName: nameMess ,
-     errorLicense: licenseMess});
+    		res.render('driverSignup', {errorM: emailMess + passMess + " **", errorEmail: dup });
+    		console.log(dup);
+    }
+    else {
+    	console.log("Validation is complete; Continue to adding user.");
+    	addUserInfo();
     }
   }
 

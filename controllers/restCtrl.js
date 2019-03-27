@@ -32,13 +32,73 @@ module.exports.addUser = function (req, res) {
   // Get user information from the restuarnt signup page.
   const email = req.body.email;
   const pwd = req.body.pwd;
+  const rPwd = req.body.repeatpwd;
   const name = req.body.name;
   const addr  = req.body.address;
   const phone  = req.body.phone;
   const creditCard = req.body.creditCard;
   // Insert data into tables;
   var sql, value;
-  addUserInfo();
+
+  validateSignUp();
+ 
+   /*
+    This function will be responsible for validating each input field of the page.
+  */
+  function validateSignUp() {
+    console.log("Validating..... \n");
+
+    var emailMess = "";
+    var passMess = "";
+    var dup = "";
+
+    var error = false;    
+
+    // If any of the fields are null, return an error message.
+    if ((email.length == 0 || !email.includes("@") || !email.includes(".com")) || (pwd.length == 0 || pwd != rPwd) || name.length ==0 ||
+      addr.length ==0 || (phone.length == 0 || phone.length != 10) || (creditCard.length == 0 || creditCard.length != 16)) 
+    {
+      if (pwd.length < 4) {
+        passMess = "Password must be at least 4 characters";
+      }
+      else if (pwd != rPwd) {passMess = "Passwords don't match.";}
+      error = true;
+      console.log("Missing Sign up information");
+      emailMess = "** Invalid information.  "
+    } 
+
+    const eQuery = 'Select Email from User \
+            where Email = ?'
+
+    const val = [email]
+    conn.query(eQuery, val, function(err, result) {
+      if (err) {console.log("Error finding email");}
+      if (result.length != 0) {
+        dup = "* Already Exists ";
+        console.log("Email Already Exists \n");
+        error = true;
+      }
+      else {
+        console.log("Email is good");
+      }
+    })
+
+
+
+    if (error == true) {
+        console.log("Errors in the page; Reloading");
+        res.render('restaurantSignup', {errorM: emailMess + passMess + " **", errorEmail: dup });
+    }
+    else {
+      console.log("Validation is complete; Continue to adding user.");
+      addUserInfo();
+    }
+
+
+
+  }
+
+
   /**
    * Insert user infomration into User table.
    */
