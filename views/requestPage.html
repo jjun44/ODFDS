@@ -91,10 +91,10 @@
     <script>
         var map;
         function initMap() {
-            var location = {lat: -25.363, lng: 131.044};
+            var location = {lat: 37.3337142, lng: -121.8855948};
             map = new google.maps.Map(document.getElementById('map'), {
                 center: location,
-                zoom: 12
+                zoom: 20
             });
             var marker = new google.maps.Marker({
                 position: location,
@@ -110,14 +110,14 @@
 <div class="split right">
     <div class="centered">
         <form class="login100-form validate-form" method="post">
-					<span class="login100-form-title p-b-20">
+					<span class="login100-form-title p-b-30">
 						Request a Driver
 					</span>
             <br><br><br>
 
 
             <div class="wrap-input100 validate-input" data-validate="Destination is required">
-                <span class="login50-form-title p-b-30">Enter the Destination</span>
+                <span class="login50-form-title p-b-20">Enter the Destination</span>
                 <input class="input100" type="text" name="destination" placeholder="Destination...">
                 <span class="focus-input100"></span>
             </div>
