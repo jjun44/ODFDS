@@ -18,12 +18,18 @@ module.exports.getTrackInfo = function (req, res) {
                d.orderId = p.orderId;'
   const value = [orderId]
   conn.query(sql, value, function (err, result) {
-    if (err) { console.log("Couldn't find!"); }
+    // If you are unable to find the order, re render the page with an error message.
+    if (err || result.length == 0) { 
+      console.log("Couldn't find !"); 
+      res.render('trackPage', {message: "** Invalid order ID **"});
+    }
+    else {
     res.render('trackPage', {'orderId': result[0].orderId,
                                'disLeft': result[0].distanceLeft,
                                'timePassed': result[0].timePassed,
                                'timeLeft': result[0].timeLeft,
                                'price': result[0].price});
+  }
   })
 }
 

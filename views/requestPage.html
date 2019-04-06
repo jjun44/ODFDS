@@ -99,7 +99,12 @@
             var marker = new google.maps.Marker({
                 position: location,
                 map: map
-            })
+            });
+
+            var marker2 = new google.maps.Marker({
+            	position: {lat: 36.3337, lng: -120.99999},
+            	map: map
+            });
         }
     </script>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNctnRjRSSJtY4Tq56wrRxowIxIGYh3zI&callback=initMap"></script>

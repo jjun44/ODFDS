@@ -12,19 +12,19 @@ var db;
 function connectDatabase() {
     if (!db) {
         db = mysql.createConnection({
-            /*
+            
             host: "localhost",
             user: "dridge",
             password: "reb123",
             database: "ODFDS"
-            */
+            
 
-        	
+        	/*
             host: "localhost",
             user: "g3",
             password: "cs160G3!",
             database: 'ODFDS'
-            
+            */
             
         });
         db.connect(function(err){
