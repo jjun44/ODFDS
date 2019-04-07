@@ -84,12 +84,30 @@
 
 }
 
+/*	Good message styling.	*/
+.gM {
+	background-color: #8A2BE2;
+	color: rgb(255,255,255);
+	text-align: center;
+	border-radius: 15px;
+	width: auto;
+	margin-bottom: 5px;
+	animation-name: transparent;
+	animation-delay: 2s;
+	animation-duration: 2s;
+	animation-fill-mode: forwards;
+
+}
+
 </style>
 
 <body>
 
 					<div class = "eM">
 						{{errorMessage}}
+					</div>
+					<div class = "gM">
+						{{goodMessage}}
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">

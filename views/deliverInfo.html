@@ -33,6 +33,27 @@
 </head>
 <body style="background-color: #999999;">
 
+
+<style type="text/css">
+            .eM {
+    font-size: 14px; 
+    background-color: rgba(255,0,0, 0.2);
+    color: rgb(255,0,0);
+    text-align: center;
+    border-radius: 15px;
+    width: auto;
+    display: inline-block;
+    height: fit-content;
+    margin-right: 7%;
+    animation-name: transparent;
+    animation-delay: 2s;
+    animation-duration: 2s;
+    animation-fill-mode: forwards;
+}
+
+
+</style>
+
 <div class="limiter">
     <div class="container-login100">
         <div class="login100-more" style="background-image: url('images/SignUpPage.jpg');"></div>
@@ -43,7 +64,14 @@
 					</span>
                 <br> <br>
                 <div class="wrap-input100 validate-input" data-validate="Order ID is required">
-                    <span class="label-input100">Check Order:</span>
+                    <span class="label-input100">Check Order:
+
+                         <span class = "eM">
+                        <!-- Dynamic variable for error message.  -->
+                        {{message}}
+                    </span>
+
+                    </span>
                     <input class="input100" type="text" name="orderId" placeholder="Enter the order ID...">
                     <span class="focus-input100"></span>
                 </div>

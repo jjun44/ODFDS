@@ -19,6 +19,7 @@ router.get('/', function(req, res, next) {
 /* Login validation */
 router.post('/', mainCtrl.login);
 
+
 /* Get restaurant sing up page */
 router.get('/restSignup', function(req, res, next) {
    res.render('restaurantSignup');

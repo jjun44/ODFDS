@@ -18,13 +18,19 @@ module.exports.getDeliveryInfo = function (req, res) {
                and d.orderId = ds.orderId and d.orderId = p.orderId'
   const value = [orderId]
   conn.query(sql, value, function (err, result) {
-    if (err) { console.log("Couldn't find!"); }
+    if (err || result.length == 0) 
+    { 
+      console.log("Couldn't find!"); 
+      res.render('deliverInfo', {message: "** Invalid order ID **"});
+    }
+    else {
     console.log(result, '\n', result.orderId);
     res.render('deliverInfo', {'orderId': result[0].orderId,
                                'rName': result[0].Name, 'rAddr': result[0].Address,
                                'dest': result[0].Destination, 'timeLeft': result[0].timeLeft,
                                'distanceLeft': result[0].distanceLeft,
                                'price': result[0].price});
+  }
   })
 }
 

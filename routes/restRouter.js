@@ -21,4 +21,9 @@ router.get('/track', function(req, res, next) {
 /* Post track page */
 router.post('/track', restCtrl.getTrackInfo);
 
+/*	Gets the restaurant's order history page */
+router.get('/rHistory', function(req, res, next) {
+	res.render('rHistory');
+});
+
 module.exports = router;

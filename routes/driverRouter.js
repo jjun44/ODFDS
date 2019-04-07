@@ -21,4 +21,10 @@ router.get('/deliveryInfo', function(req, res, next) {
 /* Post delivery info page */
 router.post('/deliveryInfo', driverCtrl.getDeliveryInfo);
 
+
+/*	Get Order history page	*/
+router.get('/dHistory', function(req, res,next) {
+	res.render('dHistory');
+});
+
 module.exports = router;
