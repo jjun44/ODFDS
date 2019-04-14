@@ -12,19 +12,32 @@ const driverCtrl = require("../controllers/driverCtrl");
 
 /* Get delivery page */
 router.get('/delivery', function(req, res, next) {
-	res.render('deliverPage');
+  if (req.session.loggedIn && req.session.type == 'Driver') {
+    res.render('deliverPage');
+  } else {
+    res.render('error', {msg:'Please login to view this page!'});
+  }
 });
+
 /* Get delivery info page */
 router.get('/deliveryInfo', function(req, res, next) {
-	res.render('deliverInfo');
+  if (req.session.loggedIn && req.session.type == 'Driver') {
+    res.render('deliverInfo');
+  } else {
+    res.render('error', {msg:'Please login to view this page!'});
+  }
 });
+
 /* Post delivery info page */
 router.post('/deliveryInfo', driverCtrl.getDeliveryInfo);
 
-
 /*	Get Order history page	*/
 router.get('/dHistory', function(req, res,next) {
-	res.render('dHistory');
+  if (req.session.loggedIn && req.session.type == 'Driver') {
+    res.render('dHistory');
+  } else {
+    res.render('error', {msg:'Please login to view this page!'});
+  }
 });
 
 module.exports = router;

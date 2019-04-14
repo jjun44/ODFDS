@@ -12,18 +12,32 @@ const restCtrl = require("../controllers/restCtrl");
 
 /* Get request page */
 router.get('/request', function(req, res, next) {
-	res.render('requestPage');
+  if (req.session.loggedIn && req.session.type == 'Restaurant') {
+    res.render('requestPage');
+  } else {
+    res.render('error', {msg:'Please login to view this page!'});
+  }
 });
+
 /* Get track page */
 router.get('/track', function(req, res, next) {
-	res.render('trackPage');
+  if (req.session.loggedIn && req.session.type == 'Restaurant') {
+    res.render('trackPage');
+  } else {
+    res.render('error', {msg:'Please login to view this page!'});
+  }
 });
+
 /* Post track page */
 router.post('/track', restCtrl.getTrackInfo);
 
-/*	Gets the restaurant's order history page */
+/*	Get the restaurant's order history page */
 router.get('/rHistory', function(req, res, next) {
-	res.render('rHistory');
+  if (req.session.loggedIn && req.session.type == 'Restaurant') {
+    res.render('rHistory');
+  } else {
+    res.render('error', {msg:'Please login to view this page!'});
+  }
 });
 
 module.exports = router;
