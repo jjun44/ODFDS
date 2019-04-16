@@ -34,6 +34,50 @@ module.exports.getDeliveryInfo = function (req, res) {
   })
 }
 
+
+module.exports.getOrderHistory = function (req, res) {
+  // If the user is logged into the website.
+  if (req.session.loggedIn) {
+    console.log('uID: ----', req.session.uID);
+
+    // Checks for any orders from the current driver profile.
+    const sql = 'select orderID \
+                from Delivery \
+                Where driverID in (Select driverID from Driver Where uID = ?)'           
+    const value = [req.session.uID];
+    conn.query(sql, value, function (err, result) {
+      if (err || result.length == 0) {
+        console.log("no orders Logged yet.");
+        res.render('dHistory');
+      }
+      else {    // Orders are currently logged for the user.
+        for (i = 0; i < 1; i++) {
+          console.log('orderID: ', result[i]);
+            const sql2 = 'select Name, Address, Destination, timeLeft, DistanceLeft, Price \
+                          from Restaurant r, Delivery d, DeliveryStatus ds, Price p \
+                          where d.orderID = ? and d.rID = r.rID and d.orderID = ds.orderID = d.orderID = p.orderID'
+            const ids = [result[i].orderID];
+            conn.query(sql2, ids, function (err, result2) {
+              if (err || result.length == 0) {
+                console.log("couldnt get info");
+                res.render('dHistory');
+              }
+              else {
+                console.log("Rendering with the information");
+                res.render('dHistory', {query: result2});
+              }
+            })
+        }
+      
+      }
+    })
+
+    // This will render the history page with the query results.
+    
+  }
+}
+
+
 /** Adds driver user infomration to User/Driver tables. */
 module.exports.addUser = function (req, res) {
   // Get user information from the driver signup page.
