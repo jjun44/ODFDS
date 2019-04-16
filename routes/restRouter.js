@@ -13,7 +13,7 @@ const restCtrl = require("../controllers/restCtrl");
 /* Get request page */
 router.get('/request', function(req, res, next) {
   if (req.session.loggedIn && req.session.type == 'Restaurant') {
-    res.render('requestPage');
+    restCtrl.request(req, res); // Get restuarant location and rend the page
   } else {
     res.render('error', {msg:'Please login to view this page!'});
   }
