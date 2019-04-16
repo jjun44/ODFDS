@@ -34,7 +34,8 @@ router.post('/deliveryInfo', driverCtrl.getDeliveryInfo);
 /*	Get Order history page	*/
 router.get('/dHistory', function(req, res,next) {
   if (req.session.loggedIn && req.session.type == 'Driver') {
-    res.render('dHistory');
+    //res.render('dHistory');
+    driverCtrl.getOrderHistory(req, res);
   } else {
     res.render('error', {msg:'Please login to view this page!'});
   }
