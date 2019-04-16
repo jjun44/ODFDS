@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/jjun44/ODFDS#readme",
   "dependencies": {
+    "@google/maps": "^0.5.5",
     "consolidate": "^0.15.1",
     "cookie-parser": "^1.4.4",
     "debug": "^4.1.1",
