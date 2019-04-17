@@ -9,14 +9,17 @@
 
 const conn = require('./dbCtrl'); // Connection to the database.
 
-/** Gets request page with the restaurant address. */
+/** Gets request page with the restaurant address and geo location. */
 module.exports.request = function (req, res) {
-  const sql = 'select Address from Restaurant where uID = ?;';
+  const sql = 'select Address, Latitude, Longitude from Restaurant r, \
+               Location l where uID = ? and r.LocationID = l.LocationID;';
   const value = [req.session.uID]; // get current logged-in user's uID
   conn.query(sql, value, function (err, result) {
     if (err) { return res.render('error', {msg:'Getting Address Failed'}); }
     if (result.length == 0) { console.log('No Address Info Found'); }
-    return res.render('requestPage', {start:result[0].Address});
+    return res.render('requestPage', {start:result[0].Address,
+                                      lat:result[0].Latitude,
+                                      lng:result[0].Longitude});
   });
 }
 
@@ -34,11 +37,11 @@ module.exports.getTrackInfo = function (req, res) {
       console.log("Couldn't find !");
       res.render('trackPage', {message: "** Invalid order ID **"});
     } else {
-      res.render('trackPage', {'orderId': result[0].orderId,
-                               'disLeft': result[0].distanceLeft,
-                               'timePassed': result[0].timePassed,
-                               'timeLeft': result[0].timeLeft,
-                               'price': result[0].price});
+      res.render('trackPage', {orderId: result[0].orderId,
+                               disLeft: result[0].distanceLeft,
+                               timePassed: result[0].timePassed,
+                               timeLeft: result[0].timeLeft,
+                               price: result[0].price});
     }
   });
 }
