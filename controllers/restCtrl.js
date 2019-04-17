@@ -26,7 +26,7 @@ module.exports.request = function (req, res) {
 /** Gets tracking information by the oder ID. */
 module.exports.getTrackInfo = function (req, res) {
   const orderId = req.body.orderId;
-  const sql = 'select d.orderId, currentLocation, Destination, distanceLeft, \
+  const sql = 'select d.orderId, Destination, distanceLeft, \
                timePassed, timeLeft, price from Delivery d, DeliveryStatus ds, \
                Price p where d.orderId = ? and d.orderId = ds.orderId and \
                d.orderId = p.orderId;';
@@ -35,13 +35,14 @@ module.exports.getTrackInfo = function (req, res) {
     // If you are unable to find the order, re render the page with an error message.
     if (err || result.length == 0) {
       console.log("Couldn't find !");
-      res.render('trackPage', {message: "** Invalid order ID **"});
+      return res.render('trackPage', {message: "** Invalid order ID **"});
     } else {
-      res.render('trackPage', {orderId: result[0].orderId,
-                               disLeft: result[0].distanceLeft,
-                               timePassed: result[0].timePassed,
-                               timeLeft: result[0].timeLeft,
-                               price: result[0].price});
+      return res.render('trackPage', {orderId: result[0].orderId,
+                                      destination: result[0].Destination,
+                                      disLeft: result[0].distanceLeft,
+                                      timePassed: result[0].timePassed,
+                                      timeLeft: result[0].timeLeft,
+                                      price: result[0].price});
     }
   });
 }

@@ -33,14 +33,14 @@
 </head>
 <body style="background-color: #999999;">
 
-        <style>     
+        <style>
 
         @keyframes transparent {
     from {opacity: 1}
     to {opacity: 0}
 }
         .eM {
-    font-size: 14px; 
+    font-size: 14px;
     background-color: rgba(255,0,0, 0.2);
     color: rgb(255,0,0);
     text-align: center;
@@ -55,7 +55,7 @@
     animation-fill-mode: forwards;
 }
 
-    
+
 
     </style>
 
@@ -70,7 +70,7 @@
                 <br> <br>
                 <div class="wrap-input100 validate-input" data-validate="Order ID is required">
                     <span class="label-input100">
-                    Track Order: 
+                    Track Order:
                         <span class = "eM">
                         <!-- Dynamic variable for error message.  -->
                         {{message}}
@@ -90,12 +90,13 @@
                 </div>
             </form>
             <br>
-            <div class="jumbotron">
+            <div id="result" class="jumbotron">
                 <h3 class="display-6">Order ID: {{orderId}}</h3>
-                <p class="lead">Distance Left:{{disLeft}}</p>
+                <p class="lead">Destination: {{destination}}</p>
+                <p class="lead">Distance Left: {{disLeft}}</p>
                 <p class="lead">Time Passed: {{timePassed}}</p>
-                <p class="lead">Estimated Time Left:{{timeLeft}}</p>
-                <p class="lead">Total Price:{{price}}</p>
+                <p class="lead">Estimated Time Left: {{timeLeft}}</p>
+                <p class="lead">Total Price: {{price}}</p>
                 <hr class="my-4">
             </div>
         </div>
