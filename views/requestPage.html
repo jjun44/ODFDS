@@ -86,11 +86,10 @@
     function initMap() {
       const directionsService = new google.maps.DirectionsService;
       const directionsDisplay = new google.maps.DirectionsRenderer;
-      const geocoder = new google.maps.Geocoder();
       // Get start and location info loaded from the database from the html page.
       const start = document.getElementById('start').innerHTML;
-      const latitude = Number(document.getElementById('lat').innerHTML);
-      const longitude = Number(document.getElementById('lng').innerHTML);
+      const latitude = parseFloat(document.getElementById('lat').innerHTML);
+      const longitude = parseFloat(document.getElementById('lng').innerHTML);
       //const location = new google.maps.LatLng(latitude, longitude);
       // Set map option and marker.
       var map = new google.maps.Map(document.getElementById('map'), {
@@ -108,24 +107,6 @@
       };
       // Event listeners for buttons.
       document.getElementById('request').addEventListener('click', onChangeHandler);
-      document.getElementById('request').addEventListener('click', function() {
-              geocodeAddress(geocoder, map);
-      });
-    }
-    /** Convert address to geographical location. */
-    function geocodeAddress(geocoder, resultsMap) {
-      var address = document.getElementById('destination').value;
-      geocoder.geocode({'address': address}, function(results, status) {
-        if (status === 'OK') {
-          resultsMap.setCenter(results[0].geometry.location);
-          var marker = new google.maps.Marker({
-            map: resultsMap,
-            position: results[0].geometry.location
-          });
-        } else {
-          alert('Geocode was not successful for the following reason: ' + status);
-        }
-      });
     }
     /** Display route from start to end on Map and show distance, estimated travel time, and price. */
     function calcRoute(directionsService, directionsDisplay) {
@@ -143,6 +124,7 @@
           directionsDisplay.setDirections(result);
           var distance = parseFloat(directionsDisplay.directions.routes[0].legs[0].distance.value) * 0.00062137; // Show in miles
           var time = parseFloat(directionsDisplay.directions.routes[0].legs[0].duration.value) / 60; // show in minutes
+          document.getElementById("result").style.visibility = 'visible';
           document.getElementById("dest").innerHTML = document.getElementById('destination').value;
           document.getElementById("distance").innerHTML = distance.toFixed(2) + ' miles';
           document.getElementById("time").innerHTML = time.toFixed(2) + ' minutes';
@@ -178,16 +160,22 @@
                     </div>
                 </div>
             </div>
-            <div class="jumbotron">
+            <div id="result" style="visibility:hidden; margin-top:20px; padding-top:30px; padding-bottom:30px;" class="jumbotron">
+              <h3 class="display-6">Route</h3>
               <p class="lead">Restaurant: <span id="start">{{start}}</span></p>
               <p class="lead">Destination: <span id="dest"></span> </p>
               <p class="lead">Distance: <span id="distance"></span></p>
               <p class="lead">Estimated Time: <span id="time"></span></p>
               <p class="lead">Price: <span id="price"></span></p>
               <hr class="my-4">
-              <p style="visibility:hidden;"><span id="lat">{{lat}}</span><span id="lng">{{lng}}</span></p>
+              <h3 class="display-6">Driver Information</h3>
+              <p class="lead">Name: {{dName}}</p>
+              <p class="lead">Phone: {{dPhone}}</p>
+              <p class="lead">Arrives in: {{arrivesIn}}</p>
+              <p class="lead">Delivery ID: {{deliveryID}}</p>
             </div>
         </form>
+        <p style="visibility:hidden;"><span id="lat">{{lat}}</span><span id="lng">{{lng}}</span></p>
       </div>
 </div>
 <!--===============================================================================================-->
