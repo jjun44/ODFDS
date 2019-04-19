@@ -30,6 +30,10 @@
     <!--===============================================================================================-->
 
     <style>
+        html {
+            height: 100%;
+        }
+
         #header {
             background-color:black;
             color:white;
@@ -69,7 +73,7 @@
             border: 1px solid #ccc;
             background-color: #f1f1f1;
             width: 25%;
-            height: 730px;
+            min-height: 100%;
         }
 
         /* Style the buttons inside the tab */
@@ -111,9 +115,108 @@
 <body>
 <div id="header">
     <h1>Driver: Order History</h1>
+
+    <!--    Dynamic variable which will be used to collect query data -->
+    <p id = "queryResult">{{query}}</p>
 </div>
 
 
+<!--  ------    Div for the tabs for the page.      -->
+<div class = "tab" id = "tabDiv">
+</div>
+
+<div id = "tabcontainer">
+
+</div>
+
+
+<script>
+    var rData = document.getElementById("queryResult").innerHTML;
+    var parseR = JSON.parse(rData);
+
+    //alert(parseR.length); Checks the amount of Orders to create tabs for
+
+    document.getElementById("queryResult").style.display = 'none';
+
+    // for dynamically creating the tabs of the webpage.
+    for (i = 0; i <parseR.length; i++) {
+        
+        var tabButton = document.createElement("button");
+        tabButton.innerHTML = "Order# " + parseR[i].orderId;
+        var od = 'od' + '' + (i + 1) + ''; 
+       
+    
+        document.getElementById("tabDiv").appendChild(tabButton);
+
+        // Creating the Divs for the tabContent.
+        var content = document.createElement("div");
+        content.id = od;
+        content.setAttribute("class", "tabContent");
+
+        // Creating the sections for the tabContent.
+        var info = document.createElement("div");
+        info.id = "section";
+
+        var orderid = document.createElement("h3");
+        var text = document.createTextNode("Order ID: " + parseR[i].orderId);
+        orderid.appendChild(text);
+
+        var hr = document.createElement("HR");
+        hr.setAttribute("class", "my-4");
+
+        var rName = document.createElement("P");
+        text = document.createTextNode("Restaurant Name: " + parseR[i].Name);
+        rName.appendChild(text);
+
+        var reuse = document.createElement("P");
+        var etext =document.createTextNode("Restaurant Address: " + parseR[i].Address);
+        reuse.appendChild(etext);
+
+        var dest = document.createElement("P");
+        dest.appendChild(document.createTextNode("Destination: " + parseR[i].Destination));
+
+        var time = document.createElement("P");
+        time.appendChild(document.createTextNode("Total Time: " + parseR[i].timeLeft));
+
+        var price = document.createElement("P");
+        price.appendChild(document.createTextNode("Total Price: " + parseR[i].price));
+
+        var hr2 = document.createElement("HR");
+        hr2.setAttribute("class", "my-4");
+
+        //Appending to create the content of the tab.
+        info.appendChild(orderid);
+        info.appendChild(hr);
+        info.appendChild(rName);
+        info.appendChild(reuse);
+        info.appendChild(dest);
+        info.appendChild(time);
+        info.appendChild(price);
+        info.appendChild(hr2);
+
+        // Appending all of the info  into a tab container, with id as 'od1', 'od2', etc...
+        content.appendChild(info);
+
+        // Setting the class of each 'p' element so it gets the fonts.
+        var ps = content.getElementsByTagName("p");
+        for (i = 0; i < ps.length; i++)  {
+            ps[i].setAttribute("class",  "lead");
+        }
+        document.getElementById("tabcontainer").appendChild(content);
+
+    }
+
+    /**
+        By using only one div for the content; it will dynamically change based on the tab that is clicked.
+    **/
+    function updateTabContent() {
+        
+    }
+
+
+</script>
+
+<!--
 <div class="tab">
     <button class="tablinks" onclick="openCity(event, 'od1')" id="defaultOpen">Order# {{orderID}}</button>
     <button class="tablinks" onclick="openCity(event, 'od2')">Order# {{orderID}}</button>
@@ -121,12 +224,16 @@
     <button class="tablinks" onclick="openCity(event, 'od4')">Order# {{orderID}}</button>
     <button class="tablinks" onclick="openCity(event, 'od5')">Order# {{orderID}}</button>
 </div>
+-->
 
+<!--
 <div id="od1" class="tabcontent">
     <div id="section">
-        <h3 class="display-6">Order ID: {{query.orderID}} </h3>
+        
+
+        <h3 class="display-6">Order ID: {{query.name}} </h3>
         <hr class="my-4">
-        <p class="lead">Restaurant Name: {{rName}}</p>
+        <p class="lead">Restaurant Name: <p id = "rName">{{rName}}</p></p>
         <p class="lead">Restaurant Address: {{rAddr}}</p>
         <p class="lead">Destination: {{dest}}</p>
         <p class="lead">Total Time: {{totalTime}}</p>
@@ -171,7 +278,17 @@
 
 </div>
 
+-->
+
+
+<!--
 <script>
+
+    var rData = document.getElementById("queryResult").innerHTML;
+    var parseR = JSON.parse(rData);
+    alert(parseR[0].orderId);
+    document.getElementById("queryResult").style.display = 'none';
+
     function openCity(evt, cityName) {
         var i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tabcontent");
@@ -189,6 +306,8 @@
     // Get the element with id="defaultOpen" and click on it
     document.getElementById("defaultOpen").click();
 </script>
+-->
+
 <!--===============================================================================================-->
 <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
 <!--===============================================================================================-->

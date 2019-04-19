@@ -53,18 +53,20 @@ module.exports.getOrderHistory = function (req, res) {
       else {    // Orders are currently logged for the user.
         for (i = 0; i < 1; i++) {
           console.log('orderID: ', result[i]);
-            const sql2 = 'select Name, Address, Destination, timeLeft, DistanceLeft, Price \
-                          from Restaurant r, Delivery d, DeliveryStatus ds, Price p \
-                          where d.orderID = ? and d.rID = r.rID and d.orderID = ds.orderID = d.orderID = p.orderID'
+            const sql2 = 'select d.orderId, Name, Address, Destination, timeLeft, \
+               distanceLeft, price from Restaurant r, Delivery d, \
+               DeliveryStatus ds, Price p where d.orderId = ? and d.rId = r.rId \
+               and d.orderId = ds.orderId and d.orderId = p.orderId'
             const ids = [result[i].orderID];
             conn.query(sql2, ids, function (err, result2) {
-              if (err || result.length == 0) {
+              if (err || result2.length == 0) {
                 console.log("couldnt get info");
                 res.render('dHistory');
               }
               else {
-                console.log("Rendering with the information");
-                res.render('dHistory', {query: result2});
+                console.log("Rendering with the information: ", result2.length);
+                console.log(JSON.stringify(result2));
+                res.render('dHistory', {query: JSON.stringify(result2)});
               }
             })
         }
