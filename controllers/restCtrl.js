@@ -47,6 +47,52 @@ module.exports.getTrackInfo = function (req, res) {
   });
 }
 
+
+module.exports.getOrderHistory = function (req, res) {
+
+  var connects = [];
+  if (req.session.loggedIn) {
+    console.log('uID: ----', req.session.uID);
+
+    // Check for any orders that the restaurant has.
+    const sql = 'select orderID \
+                from Delivery \
+                Where rID in (Select rID from Restaurant Where uID = ?)'
+    const value = [req.session.uID];
+    conn.query(sql, value, function(err, result) {
+      if (err || result.length == 0) {
+        console.log("no orders Logged yet.");
+        res.render('rHistory');
+      }
+      else {
+        for (i = 0; i < result.length; i++) {
+          console.log("orderID: ", result[i]);
+          const sql2 = 'select d.orderId, dr.Name, dr.Phone, Destination, timePassed, price \
+                        from Restaurant r, Delivery d, DeliveryStatus ds, Price p, Driver dr \
+                        where d.orderId = ? and d.rId = r.rId and d.orderId = ds.orderId and d.orderId = p.orderId and d.driverID = dr.driverID'
+          const ids = [result[i].orderID];
+          conn.query(sql2, ids, function(err, result2) {
+            if (err || result2.length ==0) {
+              console.log(err);
+              res.render('rHistory');
+            }
+            else {
+              connects.push(JSON.stringify(result2));
+              if (connects.length != result2.length) {
+                console.log("not Done");
+              }
+              else {
+                res.render('rHistory', {query: connects});
+              }
+            }
+          })
+        }
+      }
+    })
+
+  }
+}
+
 /** Adds restauraunt user infomration to User/Location/Restaurant tables. */
 module.exports.addUser = function (req, res) {
   // Get user information from the restuarnt signup page.

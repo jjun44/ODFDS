@@ -34,7 +34,8 @@ router.post('/track', restCtrl.getTrackInfo);
 /*	Get the restaurant's order history page */
 router.get('/rHistory', function(req, res, next) {
   if (req.session.loggedIn && req.session.type == 'Restaurant') {
-    res.render('rHistory');
+    //res.render('rHistory');
+    restCtrl.getOrderHistory(req, res);
   } else {
     res.render('error', {msg:'Please login to view this page!'});
   }

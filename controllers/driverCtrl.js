@@ -38,7 +38,6 @@ module.exports.getDeliveryInfo = function (req, res) {
 module.exports.getOrderHistory = function (req, res) {
   // If the user is logged into the website.
 
-  var resultSet;
   var connects = [];
   if (req.session.loggedIn) {
     console.log('uID: ----', req.session.uID);

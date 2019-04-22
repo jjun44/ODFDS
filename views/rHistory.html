@@ -111,9 +111,143 @@
 <body>
 <div id="header">
     <h1>Restaurant: Order History</h1>
+
+    <!--    Dynamic variable which will be used to collect query data -->
+    <p id = "queryResult">{{query}}</p>
 </div>
 
 
+
+<!--  ------    Div for the tabs for the page.      -->
+<div class = "tab" id = "tabDiv">
+</div>
+
+<div id = "tabcontainer">
+
+</div>
+
+
+<script>
+    var rData = document.getElementById("queryResult").innerHTML;
+
+    // Checks if any orders are logged.
+    if (rData.length == 0) {
+        alert("You have no orders logged.");
+    }
+    else {
+        rData = rData.split("],");
+    }
+    
+ 
+    // Fixing the split data and storing into an array.
+    var parseR = [];
+    for (j = 0; j < rData.length; j++) {
+
+        var tester = rData[j];
+        if (tester.charAt(tester.length - 1) != "]") {
+            
+            tester += "]";
+            
+        }
+        parseR.push(JSON.parse(tester));
+    }
+    document.getElementById("queryResult").style.display = 'none';
+
+    for (i = 0; i < parseR.length; i++) {
+
+        var tabButton = document.createElement("button");
+        tabButton.setAttribute("class", "tablinks");
+        tabButton.innerHTML = "Order# " + (i + 1);
+        const od = 'od' + '' + (i + 1) + ''; 
+        if (i == 0) {
+            tabButton.setAttribute("id", "defaultOpen");
+        }
+        else (tabButton.setAttribute("id", ""));
+
+        tabButton.onclick = function() {openCity(event, od)};
+        document.getElementById("tabDiv").appendChild(tabButton);
+
+         // Creating the Divs for the tabContent.
+        var content = document.createElement("div");
+        content.id = od;
+        content.setAttribute("class", "tabcontent");
+
+        // Creating the sections for the tabContent.
+        var info = document.createElement("div");
+        info.id = "section";
+
+        var orderid = document.createElement("h3");
+        var text = document.createTextNode("Order ID: " + parseR[i][0].orderId);
+        orderid.appendChild(text);
+
+        var hr = document.createElement("HR");
+        hr.setAttribute("class", "my-4");
+
+        var rName = document.createElement("P");
+        rName.setAttribute("class", "lead");
+        text = document.createTextNode("Driver's Name: " + parseR[i][0].Name);
+        rName.appendChild(text);
+
+        var reuse = document.createElement("P");
+        reuse.setAttribute("class", "lead");
+        var etext =document.createTextNode("Driver's Phone: (" + parseR[i][0].Phone.substring(0,3) + ") " + parseR[i][0].Phone.substring(3,6) + "-" + parseR[i][0].Phone.substring(6));
+        reuse.appendChild(etext);
+
+        var dest = document.createElement("P");
+        dest.setAttribute("class", "lead");
+        dest.appendChild(document.createTextNode("Destination: " + parseR[i][0].Destination));
+
+        var time = document.createElement("P");
+        time.setAttribute("class", "lead");
+        time.appendChild(document.createTextNode("Total Time: " + parseR[i][0].timePassed));
+
+        var price = document.createElement("P");
+        price.setAttribute("class", "lead");
+        price.appendChild(document.createTextNode("Total Price: $" + parseR[i][0].price));
+
+        var hr2 = document.createElement("HR");
+        hr2.setAttribute("class", "my-4");
+
+        //Appending to create the content of the tab.
+        info.appendChild(orderid);
+        info.appendChild(hr);
+        info.appendChild(rName);
+        info.appendChild(reuse);
+        info.appendChild(dest);
+        info.appendChild(time);
+        info.appendChild(price);
+        info.appendChild(hr2);
+
+
+        // Appending all of the info  into a tab container, with id as 'od1', 'od2', etc...
+        content.appendChild(info);
+        document.getElementById("tabcontainer").appendChild(content);
+     }
+
+
+ 
+    function openCity(evt, cityName) {
+        //alert(cityName);
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(cityName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+
+    document.getElementById("defaultOpen").click();
+</script>
+
+
+
+
+<!--
 <div class="tab">
     <button class="tablinks" onclick="openCity(event, 'od1')" id="defaultOpen">Order# {{orderID}}</button>
     <button class="tablinks" onclick="openCity(event, 'od2')">Order# {{orderID}}</button>
@@ -189,6 +323,8 @@
     // Get the element with id="defaultOpen" and click on it
     document.getElementById("defaultOpen").click();
 </script>
+-->
+
 <!--===============================================================================================-->
 <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
 <!--===============================================================================================-->
