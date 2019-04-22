@@ -33,7 +33,6 @@
         html {
             height: 100%;
         }
-
         #header {
             background-color:black;
             color:white;
@@ -54,7 +53,6 @@
             float:left;
             padding:50px;
         }
-
         #footer {
             background-color:black;
             color:white;
@@ -62,11 +60,8 @@
             text-align:center;
             padding:5px;
         }
-
-
         * {box-sizing: border-box}
         body {font-family: "Lato", sans-serif;}
-
         /* Style the tab */
         .tab {
             float: left;
@@ -75,7 +70,6 @@
             width: 25%;
             min-height: 100%;
         }
-
         /* Style the buttons inside the tab */
         .tab button {
             display: block;
@@ -90,17 +84,14 @@
             transition: 0.3s;
             font-size: 22px;
         }
-
         /* Change background color of buttons on hover */
         .tab button:hover {
             background-color: #ddd;
         }
-
         /* Create an active/current "tab button" class */
         .tab button.active {
             background-color: #ccc;
         }
-
         /* Style the tab content */
         .tabcontent {
             float: left;
@@ -109,7 +100,17 @@
             width: 70%;
             border-left: none;
             height: 730px;
+            animation: fadeEffect 1.1s;
         }
+        /* Fade in tabs */
+@-webkit-keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+@keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
     </style>
 </head>
 <body>
@@ -132,64 +133,70 @@
 
 <script>
     var rData = document.getElementById("queryResult").innerHTML;
-    var parseR = JSON.parse(rData);
-
-
-    //alert(parseR.length); Checks the amount of Orders to create tabs for
-
+    // Checks if any orders are logged.
+    if (rData.length == 0) {
+        alert("You have no orders logged.");
+    }
+    else {
+        rData = rData.split("],");
+    }
+    
+ 
+    // Fixing the split data and storing into an array.
+    var parseR = [];
+    for (j = 0; j < rData.length; j++) {
+        var tester = rData[j];
+        if (tester.charAt(tester.length - 1) != "]") {
+            
+            tester += "]";
+            
+            
+        }
+        parseR.push(JSON.parse(tester));
+    }
     document.getElementById("queryResult").style.display = 'none';
-
-    // for dynamically creating the tabs of the webpage.
-    for (i = 0; i <parseR.length; i++) {
-        
+    for (i = 0; i < parseR.length; i++) {
         var tabButton = document.createElement("button");
         tabButton.setAttribute("class", "tablinks");
         tabButton.innerHTML = "Order# " + (i + 1);
-        var od = 'od' + '' + (i + 1) + ''; 
+        const od = 'od' + '' + (i + 1) + ''; 
         if (i == 0) {
             tabButton.setAttribute("id", "defaultOpen");
         }
-
-       tabButton.onclick = function() {openCity(event, od)};
+        else (tabButton.setAttribute("id", ""));
+        tabButton.onclick = function() {openCity(event, od)};
         document.getElementById("tabDiv").appendChild(tabButton);
-
-        // Creating the Divs for the tabContent.
+         // Creating the Divs for the tabContent.
         var content = document.createElement("div");
         content.id = od;
         content.setAttribute("class", "tabcontent");
-
         // Creating the sections for the tabContent.
         var info = document.createElement("div");
         info.id = "section";
-
-
         var orderid = document.createElement("h3");
-        var text = document.createTextNode("Order ID: " + parseR[i].orderId);
+        var text = document.createTextNode("Order ID: " + parseR[i][0].orderId);
         orderid.appendChild(text);
-
         var hr = document.createElement("HR");
         hr.setAttribute("class", "my-4");
-
         var rName = document.createElement("P");
-        text = document.createTextNode("Restaurant Name: " + parseR[i].Name);
+        rName.setAttribute("class", "lead");
+        text = document.createTextNode("Restaurant Name: " + parseR[i][0].Name);
         rName.appendChild(text);
-
         var reuse = document.createElement("P");
-        var etext =document.createTextNode("Restaurant Address: " + parseR[i].Address);
+        reuse.setAttribute("class", "lead");
+        var etext =document.createTextNode("Restaurant Address: " + parseR[i][0].Address);
         reuse.appendChild(etext);
-
         var dest = document.createElement("P");
-        dest.appendChild(document.createTextNode("Destination: " + parseR[i].Destination));
-
+        dest.setAttribute("class", "lead");
+        dest.appendChild(document.createTextNode("Destination: " + parseR[i][0].Destination));
         var time = document.createElement("P");
-        time.appendChild(document.createTextNode("Total Time: " + parseR[i].timeLeft));
-
+        time.setAttribute("class", "lead");
+        time.appendChild(document.createTextNode("Total Time: " + parseR[i][0].timeLeft));
         var price = document.createElement("P");
-        price.appendChild(document.createTextNode("Total Price: " + parseR[i].price));
-
+        price.setAttribute("class", "lead");
+        price.appendChild(document.createTextNode("Total Price: $" + parseR[i][0].price));
         var hr2 = document.createElement("HR");
         hr2.setAttribute("class", "my-4");
-
         //Appending to create the content of the tab.
         info.appendChild(orderid);
         info.appendChild(hr);
@@ -199,19 +206,13 @@
         info.appendChild(time);
         info.appendChild(price);
         info.appendChild(hr2);
-
         // Appending all of the info  into a tab container, with id as 'od1', 'od2', etc...
         content.appendChild(info);
-
-        // Setting the class of each 'p' element so it gets the fonts.
-        var ps = content.getElementsByTagName("p");
-        for (i = 0; i < ps.length; i++)  {
-            ps[i].setAttribute("class",  "lead");
-        }
         document.getElementById("tabcontainer").appendChild(content);
-    }
-
+     }
+ 
     function openCity(evt, cityName) {
+        //alert(cityName);
         var i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tabcontent");
         for (i = 0; i < tabcontent.length; i++) {
@@ -224,102 +225,9 @@
         document.getElementById(cityName).style.display = "block";
         evt.currentTarget.className += " active";
     }
-
-    alert("Script Complete");
     document.getElementById("defaultOpen").click();
 </script>
 
-<!--
-<div class="tab">
-    <button class="tablinks" onclick="openCity(event, 'od1')" id="defaultOpen">Order# {{orderID}}</button>
-    <button class="tablinks" onclick="openCity(event, 'od2')">Order# {{orderID}}</button>
-    <button class="tablinks" onclick="openCity(event, 'od3')">Order# {{orderID}}</button>
-    <button class="tablinks" onclick="openCity(event, 'od4')">Order# {{orderID}}</button>
-    <button class="tablinks" onclick="openCity(event, 'od5')">Order# {{orderID}}</button>
-</div>
--->
-
-<!--
-<div id="od1" class="tabcontent">
-    <div id="section">
-        
-
-        <h3 class="display-6">Order ID: {{query.name}} </h3>
-        <hr class="my-4">
-        <p class="lead">Restaurant Name: <p id = "rName">{{rName}}</p></p>
-        <p class="lead">Restaurant Address: {{rAddr}}</p>
-        <p class="lead">Destination: {{dest}}</p>
-        <p class="lead">Total Time: {{totalTime}}</p>
-        <p class="lead">Total Price:{{price}}</p>
-        <hr class="my-4">
-    </div>
-</div>
-
-</div>
-
-<div id="od2" class="tabcontent">
-    <div id="section">
-        <h3 class="display-6">Order ID: {{query}} </h3>
-        <hr class="my-4">
-        <p class="lead">Restaurant Name: {{rName}}</p>
-        <p class="lead">Restaurant Address: {{rAddr}}</p>
-        <p class="lead">Destination: {{dest}}</p>
-        <p class="lead">Total Time: {{totalTime}}</p>
-        <p class="lead">Total Price:{{price}}</p>
-        <hr class="my-4">
-
-
-    </div>
-</div>
-
-</div>
-
-<div id="od3" class="tabcontent">
-    <div id="section">
-        <h3 class="display-6">Order ID: {{order3}} </h3>
-        <hr class="my-4">
-        <p class="lead">Restaurant Name: {{rName}}</p>
-        <p class="lead">Restaurant Address: {{rAddr}}</p>
-        <p class="lead">Destination: {{dest}}</p>
-        <p class="lead">Total Time: {{totalTime}}</p>
-        <p class="lead">Total Price:{{price}}</p>
-        <hr class="my-4">
-
-
-    </div>
-</div>
-
-</div>
-
--->
-
-
-<!--
-<script>
-
-    var rData = document.getElementById("queryResult").innerHTML;
-    var parseR = JSON.parse(rData);
-    alert(parseR[0].orderId);
-    document.getElementById("queryResult").style.display = 'none';
-
-    function openCity(evt, cityName) {
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-        }
-        tablinks = document.getElementsByClassName("tablinks");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].className = tablinks[i].className.replace(" active", "");
-        }
-        document.getElementById(cityName).style.display = "block";
-        evt.currentTarget.className += " active";
-    }
-
-    // Get the element with id="defaultOpen" and click on it
-    document.getElementById("defaultOpen").click();
-</script>
--->
 
 <!--===============================================================================================-->
 <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
@@ -342,10 +250,3 @@
 </div>
 </body>
 </html>
-
-
-
-
-
-
-

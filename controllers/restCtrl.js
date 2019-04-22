@@ -67,7 +67,7 @@ module.exports.getOrderHistory = function (req, res) {
       else {
         for (i = 0; i < result.length; i++) {
           console.log("orderID: ", result[i]);
-          const sql2 = 'select d.orderId, dr.Name, dr.Phone, Destination, timePassed, price \
+          const sql2 = 'select d.orderId, dr.Name, r.Name, dr.Phone, Destination, timePassed, price \
                         from Restaurant r, Delivery d, DeliveryStatus ds, Price p, Driver dr \
                         where d.orderId = ? and d.rId = r.rId and d.orderId = ds.orderId and d.orderId = p.orderId and d.driverID = dr.driverID'
           const ids = [result[i].orderID];
@@ -82,7 +82,7 @@ module.exports.getOrderHistory = function (req, res) {
                 console.log("not Done");
               }
               else {
-                res.render('rHistory', {query: connects});
+                res.render('rHistory', {query: connects, } );
               }
             }
           })
