@@ -37,6 +37,9 @@ module.exports.getDeliveryInfo = function (req, res) {
 
 module.exports.getOrderHistory = function (req, res) {
   // If the user is logged into the website.
+
+  var resultSet;
+  var connects = [];
   if (req.session.loggedIn) {
     console.log('uID: ----', req.session.uID);
 
@@ -51,31 +54,32 @@ module.exports.getOrderHistory = function (req, res) {
         res.render('dHistory');
       }
       else {    // Orders are currently logged for the user.
-        for (i = 0; i < 1; i++) {
+        for (i = 0; i < result.length; i++) {
           console.log('orderID: ', result[i]);
-            const sql2 = 'select d.orderId, Name, Address, Destination, timeLeft, \
-               distanceLeft, price from Restaurant r, Delivery d, \
-               DeliveryStatus ds, Price p where d.orderId = ? and d.rId = r.rId \
-               and d.orderId = ds.orderId and d.orderId = p.orderId'
-            const ids = [result[i].orderID];
-            conn.query(sql2, ids, function (err, result2) {
-              if (err || result2.length == 0) {
-                console.log("couldnt get info");
+          const sql2 = 'select d.orderId, Name, Address, Destination, timeLeft, \
+             distanceLeft, price from Restaurant r, Delivery d, \
+             DeliveryStatus ds, Price p where d.orderId = ? and d.rId = r.rId \
+             and d.orderId = ds.orderId and d.orderId = p.orderId'
+          const ids = [result[i].orderID];
+          conn.query(sql2, ids, function (err, result2) {
+            if (err || result2.length == 0) {
+              console.log("couldnt get info");
                 res.render('dHistory');
               }
-              else {
-                console.log("Rendering with the information: ", result2.length);
-                console.log(JSON.stringify(result2));
-                res.render('dHistory', {query: JSON.stringify(result2)});
+            else {
+                connects.push(JSON.stringify(result2));
+                if (connects.length != result.length) {
+                  console.log("not done");
+                }
+                else {
+                  res.render('dHistory', {query: connects});
+                }
               }
             })
-        }
-      
+          
+        }     
       }
     })
-
-    // This will render the history page with the query results.
-    
   }
 }
 
