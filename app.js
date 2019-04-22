@@ -23,9 +23,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use(session({
-  genid: (req) => {
-    return uuid();
-  },
+  genid: (req) => { return uuid(); },
+  cookie: { maxAge: 10 * 60 * 6000 }, // expires after 10m
   secret: 'secret',
   resave: true,
   saveUninitialized: true

@@ -47,7 +47,6 @@
             font-family: Arial;
             color: white;
         }
-
         .split {
             height: 100%;
             position: fixed;
@@ -56,19 +55,16 @@
             overflow-x: hidden;
             padding-top: 0px;
         }
-
         .left {
             width: 65%;
             left: 0;
             background-color: #111;
         }
-
         .right {
             width: 35%;
             right: 0;
             background-color: white;
         }
-
         .centered {
             position: absolute;
             top: 50%;
@@ -76,75 +72,112 @@
             transform: translate(-50%, -50%);
             text-align: center;
         }
-
         .centered img {
             width: 150px;
             border-radius: 50%;
         }
-
     </style>
 </head>
 <body style="background-color: #999999;">
-
 <div class="split left">
     <div id="map"></div>
     <script>
-        var map;
-        function initMap() {
-            var location = {lat: 37.3337142, lng: -121.8855948};
-            map = new google.maps.Map(document.getElementById('map'), {
-                center: location,
-                zoom: 20
-            });
-            var marker = new google.maps.Marker({
-                position: location,
-                map: map
-            });
-
-            var marker2 = new google.maps.Marker({
-            	position: {lat: 36.3337, lng: -120.99999},
-            	map: map
-            });
+    /** Initialize the map with the restaurant's location info. **/
+    function initMap() {
+      const directionsService = new google.maps.DirectionsService;
+      const directionsDisplay = new google.maps.DirectionsRenderer;
+      // Get start and location info loaded from the database from the html page.
+      const start = document.getElementById('start').innerHTML;
+      const latitude = parseFloat(document.getElementById('lat').innerHTML);
+      const longitude = parseFloat(document.getElementById('lng').innerHTML);
+      //const location = new google.maps.LatLng(latitude, longitude);
+      // Set map option and marker.
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 20,
+        center: { lat: latitude, lng: longitude }
+      });
+      var marker = new google.maps.Marker({
+          position: { lat: latitude, lng: longitude },
+          map: map
+      })
+      directionsDisplay.setMap(map);
+      // When button clicked, show route from start to end.
+      var onChangeHandler = function() {
+        calcRoute(directionsService, directionsDisplay);
+      };
+      // Event listeners for buttons.
+      document.getElementById('request').addEventListener('click', onChangeHandler);
+    }
+    /** Display route from start to end on Map and show distance, estimated travel time, and price. */
+    function calcRoute(directionsService, directionsDisplay) {
+      var request = {
+        origin: document.getElementById('start').innerHTML,
+        destination: document.getElementById('destination').value,
+        travelMode: 'DRIVING',
+        drivingOptions: {
+          departureTime: new Date(Date.now()), // required for driving Option
+          trafficModel: 'bestguess' // calculate estimated time based on live traffic
         }
+      };
+      directionsService.route(request, function(result, status) {
+        if (status == 'OK') {
+          directionsDisplay.setDirections(result);
+          var distance = parseFloat(directionsDisplay.directions.routes[0].legs[0].distance.value) * 0.00062137; // Show in miles
+          var time = parseFloat(directionsDisplay.directions.routes[0].legs[0].duration.value) / 60; // show in minutes
+          document.getElementById("result").style.visibility = 'visible';
+          document.getElementById("dest").innerHTML = document.getElementById('destination').value;
+          document.getElementById("distance").innerHTML = distance.toFixed(2) + ' miles';
+          document.getElementById("time").innerHTML = time.toFixed(2) + ' minutes';
+          document.getElementById("price").innerHTML = '$' + (distance * 2 + time * .5).toFixed(2);
+        } else {
+          window.alert('Directions request failed due to ' + status);
+        }
+      });
+    }
     </script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNctnRjRSSJtY4Tq56wrRxowIxIGYh3zI&callback=initMap"></script>
-
+    <script asyn defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdB1kiL0pp6mB4jv_yqs0q9Oiuett2cbs&callback=initMap">
+    </script>
 </div>
-
-
 <div class="split right">
-    <div class="centered">
+  <div class="wrap-login100 p-l-60 p-r-50 p-t-32 p-b-50">
         <form class="login100-form validate-form" method="post">
 					<span class="login100-form-title p-b-30">
 						Request a Driver
 					</span>
             <br><br><br>
-
-
             <div class="wrap-input100 validate-input" data-validate="Destination is required">
                 <span class="login50-form-title p-b-20">Enter the Destination</span>
-                <input class="input100" type="text" name="destination" placeholder="Destination...">
+                <input class="input100" type="text" id="destination" placeholder="Destination...">
                 <span class="focus-input100"></span>
             </div>
 
             <div class="container-login100-form-btn">
                 <div class="wrap-login100-form-btn">
                     <div class="login100-form-bgbtn"></div>
-                    <button class="login100-form-btn">
-                        Request
-                    </button>
+                    <div class="login100-form-btn">
+                      <input id="request" type="button" value="Request"/>
+                    </div>
                 </div>
             </div>
+            <div id="result" style="visibility:hidden; margin-top:20px; padding-top:30px; padding-bottom:30px;" class="jumbotron">
+              <h3 class="display-6">Route</h3>
+              <p class="lead">Restaurant: <span id="start">{{start}}</span></p>
+              <p class="lead">Destination: <span id="dest"></span> </p>
+              <p class="lead">Distance: <span id="distance"></span></p>
+              <p class="lead">Estimated Time: <span id="time"></span></p>
+              <p class="lead">Price: <span id="price"></span></p>
+              <hr class="my-4">
+              <h3 class="display-6">Driver Information</h3>
+              <p class="lead">Name: {{dName}}</p>
+              <p class="lead">Phone: {{dPhone}}</p>
+              <p class="lead">Arrives in: {{arrivesIn}}</p>
+              <p class="lead">Delivery ID: {{deliveryID}}</p>
+            </div>
         </form>
-    </div>
+        <p style="visibility:hidden;"><span id="lat">{{lat}}</span><span id="lng">{{lng}}</span></p>
+      </div>
 </div>
-
-
-
-
-
-
-
 <!--===============================================================================================-->
 <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
 <!--===============================================================================================-->
@@ -161,6 +194,5 @@
 <script src="vendor/countdowntime/countdowntime.js"></script>
 <!--===============================================================================================-->
 <script src="js/main.js"></script>
-
 </body>
 </html>
