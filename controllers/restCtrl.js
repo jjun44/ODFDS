@@ -8,19 +8,87 @@
  */
 
 const conn = require('./dbCtrl'); // Connection to the database.
+const socketApi = require('./socketApi');
+//const async = require("async");
 
-/** Gets request page with the restaurant address and geo location. */
+/** Gets restaurant and nearest driver information. */
 module.exports.request = function (req, res) {
-  const sql = 'select Address, Latitude, Longitude from Restaurant r, \
+  // Find current user's address information.
+  var sql = 'select Address, Latitude, Longitude, rID, r.LocationID from Restaurant r, \
                Location l where uID = ? and r.LocationID = l.LocationID;';
-  const value = [req.session.uID]; // get current logged-in user's uID
+  var value = [req.session.uID]; // get current logged-in user's uID
+  var distances = {}; // to hold available drivers with distances to the restaurant
   conn.query(sql, value, function (err, result) {
     if (err) { return res.render('error', {msg:'Getting Address Failed'}); }
-    if (result.length == 0) { console.log('No Address Info Found'); }
-    return res.render('requestPage', {start:result[0].Address,
-                                      lat:result[0].Latitude,
-                                      lng:result[0].Longitude});
+    global.distances = {};
+    res.render('requestPage', { start:result[0].Address, lat:result[0].Latitude, lng:result[0].Longitude });
+    findDriver([result[0].Address, result[0].Latitude, result[0].Longitude, result[0].rID, result[0].LocationID]);
   });
+
+  function findDriver (restaurant) {
+    // Find all available drivers.
+    sql = 'select driverID, Name, Phone, Latitude, Longitude from Driver d, \
+           Location lo where Working = 0 and Notification = \'ON\' and \
+           d.LocationID = lo.LocationID;';
+    conn.query(sql, function (err, drivers) {
+       // Convert Drivers' current latitudes and longitudes into Address.
+       for (const driver of drivers) {
+         geoToAddress(drivers, driver, restaurant, findNearest);
+       }
+    });
+  }
+
+  function geoToAddress(drivers, driver, restaurant, callback) {
+    googleMapsClient = require('@google/maps').createClient({
+        key: 'AIzaSyDNctnRjRSSJtY4Tq56wrRxowIxIGYh3zI',
+      });
+    googleMapsClient.reverseGeocode({latlng: [driver.Latitude, driver.Longitude]
+       }, function(err, res) {
+          if (!err) {
+            // Find nearest driver
+            callback(drivers, driver, res.json.results[0].formatted_address, restaurant, googleMapsClient);
+        }
+    });
+  }
+
+  function findNearest(drivers, driver, dAddr, restaurant, googleMapsClient) {
+    var inOneHour = Math.round((new Date().getTime() + 60 * 60 * 1000)/1000);
+    googleMapsClient.directions({
+        origin: dAddr,
+        destination: restaurant[0],
+        departure_time: inOneHour,
+        mode: 'driving',
+        traffic_model: 'best_guess'
+      }, function(err, results) {
+          if (!err) {
+            var distance = results.json.routes[0].legs[0].distance.text;
+            var duration = results.json.routes[0].legs[0].duration.text;
+            distances[driver.driverID] = [driver.Name, driver.Phone, distance, duration];
+            // Find the nearest driver
+            if (drivers.length == Object.keys(distances).length) {
+              console.log(distances);
+              var minID, minDistance = 99999;
+              for (key in distances) {
+                if (minDistance > parseFloat(distances[key][2])) {
+                  minID = key;
+                  minDistance = parseFloat(distances[key][2]);
+                }
+              }
+              console.log(restaurant[0], restaurant[1], restaurant[2],
+                distances[minID][0], distances[minID][1], distances[minID][2], distances[minID][3]);
+              // Send driver information to the user
+              socketApi.driverInfo(distances[minID][0], distances[minID][1], distances[minID][2], distances[minID][3]);
+              // Save delivery info to delivery table
+              //saveDelivery(restaurant, driverID);
+            }
+          }
+      });
+    }
+    function saveDelivery (restaurant, driverID) {
+      // rID, driverID, startTime, endTime, Date, Destination, destID into Delivery table
+      console.log("save Delievry");
+      //console.log(restaurant[3], driverID, new Time(), null, new Date(), restaurant[0], restaurant[4]);
+    }
 }
 
 /** Gets tracking information by the oder ID. */
@@ -47,9 +115,7 @@ module.exports.getTrackInfo = function (req, res) {
   });
 }
 
-
 module.exports.getOrderHistory = function (req, res) {
-
   var connects = [];
   if (req.session.loggedIn) {
     console.log('uID: ----', req.session.uID);
@@ -89,7 +155,6 @@ module.exports.getOrderHistory = function (req, res) {
         }
       }
     })
-
   }
 }
 

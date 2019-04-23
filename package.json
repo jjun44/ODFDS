@@ -25,9 +25,11 @@
     "debug": "^4.1.1",
     "express": "^4.16.4",
     "express-session": "^1.16.1",
+    "http": "0.0.0",
     "http-errors": "^1.7.2",
     "morgan": "^1.9.1",
     "mysql": "^2.16.0",
+    "socket.io": "^2.2.0",
     "swig": "^1.4.2",
     "uuid": "^3.3.2"
   },

@@ -90,7 +90,6 @@
       const start = document.getElementById('start').innerHTML;
       const latitude = parseFloat(document.getElementById('lat').innerHTML);
       const longitude = parseFloat(document.getElementById('lng').innerHTML);
-      //const location = new google.maps.LatLng(latitude, longitude);
       // Set map option and marker.
       var map = new google.maps.Map(document.getElementById('map'), {
         zoom: 20,
@@ -99,7 +98,7 @@
       var marker = new google.maps.Marker({
           position: { lat: latitude, lng: longitude },
           map: map
-      })
+      });
       directionsDisplay.setMap(map);
       // When button clicked, show route from start to end.
       var onChangeHandler = function() {
@@ -138,10 +137,25 @@
     <script asyn defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdB1kiL0pp6mB4jv_yqs0q9Oiuett2cbs&callback=initMap">
     </script>
+    <!-- Server will send the nearest driver information to the user dynamically -->
+    <script src = "/socket.io/socket.io.js"></script>
+    <script>
+      var socket = io();
+      //setTimeout(function(){
+        socket.on('driverFound', function(data){
+          //document.getElementById("waitMsg").style.visibility = 'hidden';
+          //document.getElementById("driverInfo").style.visibility = 'visible';
+          document.getElementById("dName").innerHTML = data.dName;
+          document.getElementById("dPhone").innerHTML = data.dPhone;
+          document.getElementById("dDistance").innerHTML = data.distance;
+          document.getElementById("arrivesIn").innerHTML = data.arrivesIn;
+        });
+      //}, 2000);
+    </script>
 </div>
 <div class="split right">
   <div class="wrap-login100 p-l-60 p-r-50 p-t-32 p-b-50">
-        <form class="login100-form validate-form" method="post">
+        <form class="login100-form validate-form">
 					<span class="login100-form-title p-b-30">
 						Request a Driver
 					</span>
@@ -155,24 +169,23 @@
             <div class="container-login100-form-btn">
                 <div class="wrap-login100-form-btn">
                     <div class="login100-form-bgbtn"></div>
-                    <div class="login100-form-btn">
-                      <input id="request" type="button" value="Request"/>
-                    </div>
+                      <input id="request" type="button" value="Request" style="background:#9B59B6; color:#fff; padding:10px 150px 10px 150px;"/>
                 </div>
             </div>
             <div id="result" style="visibility:hidden; margin-top:20px; padding-top:30px; padding-bottom:30px;" class="jumbotron">
-              <h3 class="display-6">Route</h3>
+              <h3 class="display-6" style="color:black;">Route</h3>
               <p class="lead">Restaurant: <span id="start">{{start}}</span></p>
               <p class="lead">Destination: <span id="dest"></span> </p>
               <p class="lead">Distance: <span id="distance"></span></p>
               <p class="lead">Estimated Time: <span id="time"></span></p>
               <p class="lead">Price: <span id="price"></span></p>
               <hr class="my-4">
-              <h3 class="display-6">Driver Information</h3>
-              <p class="lead">Name: {{dName}}</p>
-              <p class="lead">Phone: {{dPhone}}</p>
-              <p class="lead">Arrives in: {{arrivesIn}}</p>
-              <p class="lead">Delivery ID: {{deliveryID}}</p>
+              <h3 class="display-6" style="color:black;">Driver Information</h3>
+              <p class="lead">Name: <span id="dName"></span></p>
+              <p class="lead">Phone: <span id="dPhone"></span></p>
+              <p class="lead">How far away: <span id="dDistance"></span></p>
+              <p class="lead">Arrives in: <span id="arrivesIn"></span></p>
+              <p class="lead">Delivery ID: <span id="deliveryID"></span></p>
             </div>
         </form>
         <p style="visibility:hidden;"><span id="lat">{{lat}}</span><span id="lng">{{lng}}</span></p>
