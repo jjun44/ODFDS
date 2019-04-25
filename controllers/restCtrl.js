@@ -101,7 +101,7 @@ module.exports.findDriver = function (req, res) {
       var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
       var dest = req.body.destination;
       sql = 'INSERT INTO Delivery (rID, driverID, startTime, Date, Destination) \
-              VALUE(?, ?, ?, ?, ?, ?);';
+              VALUE(?, ?, ?, ?, ?);';
       value = [rID, driverID, time, date, dest];
       conn.query(sql, value, function (err, result) {
         if (err) { console.log('Inserting to Delivery Failed..'); }
