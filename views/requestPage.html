@@ -175,12 +175,6 @@
                 </div>
             </div>
 		<br><br><br>
-            <div class="container-login100-form-btn">
-                <div class="wrap-login100-form-btn" align="center">
-                    <div class="login100-form-bgbtn"></div>
-                    <a href="/rest"><button class="login100-form-btn" >Go Back</button></a>
-                </div>
-            </div>
             <div id="result" style="visibility:hidden; margin-top:20px; padding-top:30px; padding-bottom:30px;" class="jumbotron">
               <h3 class="display-6" style="color:#1C2833">Restaurant ID: <span id="rID">{{rID}}</span></h3>
               <hr class="my-4">
@@ -200,6 +194,12 @@
               <p class="lead">Arrives in: <span id="arrivesIn"></span></p>
             </div>
         </form>
+        <div class="container-login100-form-btn">
+            <div class="wrap-login100-form-btn" align="center">
+                <div class="login100-form-bgbtn"></div>
+                <button class="login100-form-btn" onclick="window.location.href='/rest'">Go Back</button>
+            </div>
+        </div>
         <p style="visibility:hidden;"><span id="lat">{{lat}}</span><span id="lng">{{lng}}</span></p>
       </div>
 </div>
