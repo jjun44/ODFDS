@@ -19,6 +19,8 @@ router.get('/request', function(req, res, next) {
   }
 });
 
+router.post('/request', restCtrl.findDriver);
+
 /* Get track page */
 router.get('/track', function(req, res, next) {
   if (req.session.loggedIn && req.session.type == 'Restaurant') {
