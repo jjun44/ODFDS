@@ -149,39 +149,41 @@
           document.getElementById("dPhone").innerHTML = data.dPhone;
           document.getElementById("dDistance").innerHTML = data.distance;
           document.getElementById("arrivesIn").innerHTML = data.arrivesIn;
+          document.getElementById("orderID").innerHTML = data.orderID;
         });
       //}, 2000);
     </script>
 </div>
 <div class="split right">
   <div class="wrap-login100 p-l-60 p-r-50 p-t-32 p-b-50">
-        <form class="login100-form validate-form">
+        <form class="login100-form validate-form" method="post">
 					<span class="login100-form-title p-b-30">
 						Request a Driver
 					</span>
             <br><br><br>
             <div class="wrap-input100 validate-input" data-validate="Destination is required">
                 <span class="login50-form-title p-b-20">Enter the Destination</span>
-                <input class="input100" type="text" id="destination" placeholder="Destination...">
+                <input class="input100" type="text" id="destination" name="destination" placeholder="Destination...">
                 <span class="focus-input100"></span>
             </div>
-
             <div class="container-login100-form-btn">
                 <div class="wrap-login100-form-btn">
                     <div class="login100-form-bgbtn"></div>
-                      <input id="request" type="button" value="Request" style="background:#e8519e; color:#fff; padding:10px 150px 10px 150px;"/>
+                    <button id="request" class="login100-form-btn">
+                        Request
+                    </button>
                 </div>
             </div>
 		<br><br><br>
             <div class="container-login100-form-btn">
                 <div class="wrap-login100-form-btn" align="center">
                     <div class="login100-form-bgbtn"></div>
-                    <input id="goback" type="button" onclick="window.location.href='/rest'" value="Go Back" style="background:#e8519e; color:#fff; padding:10px 150px 10px 150px;"/>
+                    <a href="/rest"><button class="login100-form-btn" >Go Back</button></a>
                 </div>
             </div>
-
-
             <div id="result" style="visibility:hidden; margin-top:20px; padding-top:30px; padding-bottom:30px;" class="jumbotron">
+              <h3 class="display-6">Restaurant ID: <span id="rID">{{rID}}</span></h3>
+              <hr class="my-4">
               <h3 class="display-6" style="color:black;">Route</h3>
               <p class="lead">Restaurant: <span id="start">{{start}}</span></p>
               <p class="lead">Destination: <span id="dest"></span> </p>
@@ -194,7 +196,7 @@
               <p class="lead">Phone: <span id="dPhone"></span></p>
               <p class="lead">How far away: <span id="dDistance"></span></p>
               <p class="lead">Arrives in: <span id="arrivesIn"></span></p>
-              <p class="lead">Delivery ID: <span id="deliveryID"></span></p>
+              <p class="lead">Order ID: <span id="orderID"></span></p>
             </div>
         </form>
         <p style="visibility:hidden;"><span id="lat">{{lat}}</span><span id="lng">{{lng}}</span></p>
