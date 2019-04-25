@@ -20,7 +20,7 @@ router.get('/request', function(req, res, next) {
 });
 
 /* Post request page */
-router.post('/request', restCtrl.findDriver);
+router.post('/request', restCtrl.orderRequest);
 
 /* Get track page */
 router.get('/track', function(req, res, next) {

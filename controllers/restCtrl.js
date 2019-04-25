@@ -14,8 +14,8 @@ const socketApi = require('./socketApi');
 /** Gets request page with restaurant information. */
 module.exports.request = function (req, res) {
   // Find current user's address information.
-  var sql = 'select Latitude, Longitude from Restaurant r, \
-               Location l where uID = ? and r.LocationID = l.LocationID;';
+  var sql = 'SELECT Latitude, Longitude FROM Restaurant r, \
+               Location l WHERE uID = ? AND r.LocationID = l.LocationID;';
   var value = [req.session.uID]; // get current logged-in user's uID
   var distances = {}; // to hold available drivers with distances to the restaurant
   conn.query(sql, value, function (err, result) {
@@ -26,21 +26,55 @@ module.exports.request = function (req, res) {
 }
 
 /** Find the nearest driver and save delivery info to the database */
-module.exports.findDriver = function (req, res) {
+module.exports.orderRequest = function (req, res) {
+  console.log("Order request posted");
+  calcRoute();
+  findDriver();
+
+  function calcRoute(callback) {
+    console.log("Calculating route...");
+    const pricePerMile = 2; // charge $2 per mile
+    const pricePerMinute = .1; // charge $0.1 per minute
+    var dest = req.body.destination;
+    var inOneHour = Math.round((new Date().getTime() + 60 * 60 * 1000)/1000);
+    googleMapsClient = require('@google/maps').createClient({
+        key: 'AIzaSyDNctnRjRSSJtY4Tq56wrRxowIxIGYh3zI',
+      });
+    googleMapsClient.directions({
+        origin: req.session.rAddr, // from restaurant
+        destination: dest, // to destination
+        departure_time: inOneHour,
+        mode: 'driving',
+        traffic_model: 'best_guess'
+      }, function(err, results) {
+          if (!err) {
+            var distance = results.json.routes[0].legs[0].distance.text;
+            var duration = results.json.routes[0].legs[0].duration.text;
+            var rName = req.session.rName;
+            var rAddr = req.session.rAddr;
+            var price = (parseFloat(distance) * pricePerMile + parseFloat(duration) * pricePerMinute).toFixed(2);
+            console.log(rName, rAddr, dest, distance, duration, price);
+            socketApi.sendOrderInfo(rName, rAddr, dest, distance, duration, price);
+          }
+      });
+  }
+
+  function findDriver() {
     console.log("Finding a driver...");
     global.distances = {};
     // Find all available drivers.
-    sql = 'select driverID, Name, Phone, Latitude, Longitude from Driver d, \
-           Location lo where Working = 0 and Notification = \'ON\' and \
+    sql = 'SELECT driverID, Name, Phone, Latitude, Longitude FROM Driver d, \
+           Location lo WHERE Working = 0 and Notification = \'ON\' AND \
            d.LocationID = lo.LocationID;';
     conn.query(sql, function (err, drivers) {
        // Convert Drivers' current latitudes and longitudes into Address.
        for (const driver of drivers) {
-         geoToAddress(drivers, driver, findNearest);
+         geoToAddress(drivers, driver);
        }
     });
+  }
 
-  function geoToAddress(drivers, driver, callback) {
+  function geoToAddress(drivers, driver) {
     console.log("Changing geolocation to address...");
     googleMapsClient = require('@google/maps').createClient({
         key: 'AIzaSyDNctnRjRSSJtY4Tq56wrRxowIxIGYh3zI',
@@ -49,7 +83,7 @@ module.exports.findDriver = function (req, res) {
        }, function(err, res) {
           if (!err) {
             // Find nearest driver
-            callback(drivers, driver, res.json.results[0].formatted_address, googleMapsClient);
+            findNearest(drivers, driver, res.json.results[0].formatted_address, googleMapsClient);
         }
     });
   }
@@ -101,7 +135,7 @@ module.exports.findDriver = function (req, res) {
         else {
           console.log('\nInserting delivery info into the db done successfully.\n');
           // Send driver and delivery info to the restuarant user
-          socketApi.sendDeliveryInfo(driver[0], driver[1], driver[2], driver[3], result.insertId);
+          socketApi.sendDriverInfo(driver[0], driver[1], driver[2], driver[3], result.insertId);
         }
       });
     }

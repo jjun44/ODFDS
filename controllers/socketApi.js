@@ -19,9 +19,14 @@ io.on('connection', function(socket){
   });
 });
 
-socketApi.sendDeliveryInfo = function(dName, dPhone, distance, arrivesIn, orderID) {
+socketApi.sendOrderInfo = function(rName, rAddr, dest, distance, duration, price) {
+  console.log('Sending order information to a user...');
+  io.sockets.emit('orderInfo', { rName: rName, rAddr: rAddr, dest: dest,
+                                   distance: distance, duration: duration, price: price });
+}
+socketApi.sendDriverInfo = function(dName, dPhone, distance, arrivesIn, orderID) {
   console.log('Sending delivery information to a restaurant user...');
-  io.sockets.emit('driverFound', { dName: dName, dPhone: dPhone,
+  io.sockets.emit('driverInfo', { dName: dName, dPhone: dPhone,
                                    distance: distance, arrivesIn: arrivesIn,
                                    orderID: orderID });
 }

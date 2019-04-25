@@ -102,13 +102,13 @@
       directionsDisplay.setMap(map);
       // When button clicked, show route from start to end.
       var onChangeHandler = function() {
-        calcRoute(directionsService, directionsDisplay);
+        displayRoute(directionsService, directionsDisplay);
       };
-      // Event listeners for buttons.
+      // Event listeners for the request button.
       document.getElementById('request').addEventListener('click', onChangeHandler);
     }
-    /** Display route from start to end on Map and show distance, estimated travel time, and price. */
-    function calcRoute(directionsService, directionsDisplay) {
+    /** Display route from start to end on Map. */
+    function displayRoute(directionsService, directionsDisplay) {
       var request = {
         origin: document.getElementById('start').innerHTML,
         destination: document.getElementById('destination').value,
@@ -121,13 +121,6 @@
       directionsService.route(request, function(result, status) {
         if (status == 'OK') {
           directionsDisplay.setDirections(result);
-          var distance = parseFloat(directionsDisplay.directions.routes[0].legs[0].distance.value) * 0.00062137; // Show in miles
-          var time = parseFloat(directionsDisplay.directions.routes[0].legs[0].duration.value) / 60; // show in minutes
-          document.getElementById("result").style.visibility = 'visible';
-          document.getElementById("dest").innerHTML = document.getElementById('destination').value;
-          document.getElementById("distance").innerHTML = distance.toFixed(2) + ' miles';
-          document.getElementById("time").innerHTML = time.toFixed(2) + ' minutes';
-          document.getElementById("price").innerHTML = '$' + (distance * 2 + time * .5).toFixed(2);
         } else {
           window.alert('Directions request failed due to ' + status);
         }
@@ -141,16 +134,23 @@
     <script src = "/socket.io/socket.io.js"></script>
     <script>
       var socket = io();
+      socket.on('orderInfo', function(data) {
+        document.getElementById("result").style.visibility = 'visible';
+        document.getElementById("dest").innerHTML = document.getElementById('destination').value;
+        document.getElementById("distance").innerHTML = data.distance;
+        document.getElementById("time").innerHTML = data.duration;
+        document.getElementById("price").innerHTML = '$' + data.price;
+      });
       //setTimeout(function(){
-        socket.on('driverFound', function(data){
-          //document.getElementById("waitMsg").style.visibility = 'hidden';
-          //document.getElementById("driverInfo").style.visibility = 'visible';
-          document.getElementById("dName").innerHTML = data.dName;
-          document.getElementById("dPhone").innerHTML = data.dPhone;
-          document.getElementById("dDistance").innerHTML = data.distance;
-          document.getElementById("arrivesIn").innerHTML = data.arrivesIn;
-          document.getElementById("orderID").innerHTML = data.orderID;
-        });
+      socket.on('driverInfo', function(data){
+        //document.getElementById("waitMsg").style.visibility = 'hidden';
+        //document.getElementById("driverInfo").style.visibility = 'visible';
+        document.getElementById("dName").innerHTML = data.dName;
+        document.getElementById("dPhone").innerHTML = data.dPhone;
+        document.getElementById("dDistance").innerHTML = data.distance;
+        document.getElementById("arrivesIn").innerHTML = data.arrivesIn;
+        document.getElementById("orderID").innerHTML = data.orderID;
+      });
       //}, 2000);
     </script>
 </div>
