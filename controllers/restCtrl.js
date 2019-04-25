@@ -14,14 +14,13 @@ const socketApi = require('./socketApi');
 /** Gets request page with restaurant information. */
 module.exports.request = function (req, res) {
   // Find current user's address information.
-  var sql = 'select Address, Latitude, Longitude, rID, r.LocationID from Restaurant r, \
+  var sql = 'select Latitude, Longitude from Restaurant r, \
                Location l where uID = ? and r.LocationID = l.LocationID;';
   var value = [req.session.uID]; // get current logged-in user's uID
   var distances = {}; // to hold available drivers with distances to the restaurant
   conn.query(sql, value, function (err, result) {
     if (err) { return res.render('error', {msg:'Getting Address Failed'}); }
-
-    res.render('requestPage', { start:result[0].Address, rID:result[0].rID,
+    res.render('requestPage', { start:req.session.rAddr, rID:req.session.rID,
                                 lat:result[0].Latitude, lng:result[0].Longitude });
   });
 }
@@ -29,25 +28,19 @@ module.exports.request = function (req, res) {
 /** Find the nearest driver and save delivery info to the database */
 module.exports.findDriver = function (req, res) {
     console.log("Finding a driver...");
-    // Get restaurant info from the db
-    var sql = 'select rID, Address from Restaurant where uID = ?;';
-    var value = [req.session.uID];
-    conn.query(sql, value, function (err, result) {
-      if (err) { return res.render('error', {msg:'Database connection failed'}); }
-      global.distances = {};
-      // Find all available drivers.
-      sql = 'select driverID, Name, Phone, Latitude, Longitude from Driver d, \
-             Location lo where Working = 0 and Notification = \'ON\' and \
-             d.LocationID = lo.LocationID;';
-      conn.query(sql, function (err, drivers) {
-         // Convert Drivers' current latitudes and longitudes into Address.
-         for (const driver of drivers) {
-           geoToAddress(drivers, driver, result[0].rID, result[0].Address, findNearest);
-         }
-      });
+    global.distances = {};
+    // Find all available drivers.
+    sql = 'select driverID, Name, Phone, Latitude, Longitude from Driver d, \
+           Location lo where Working = 0 and Notification = \'ON\' and \
+           d.LocationID = lo.LocationID;';
+    conn.query(sql, function (err, drivers) {
+       // Convert Drivers' current latitudes and longitudes into Address.
+       for (const driver of drivers) {
+         geoToAddress(drivers, driver, findNearest);
+       }
     });
 
-  function geoToAddress(drivers, driver, rID, rAddr, callback) {
+  function geoToAddress(drivers, driver, callback) {
     console.log("Changing geolocation to address...");
     googleMapsClient = require('@google/maps').createClient({
         key: 'AIzaSyDNctnRjRSSJtY4Tq56wrRxowIxIGYh3zI',
@@ -56,17 +49,17 @@ module.exports.findDriver = function (req, res) {
        }, function(err, res) {
           if (!err) {
             // Find nearest driver
-            callback(drivers, driver, res.json.results[0].formatted_address, rID, rAddr, googleMapsClient);
+            callback(drivers, driver, res.json.results[0].formatted_address, googleMapsClient);
         }
     });
   }
 
-  function findNearest(drivers, driver, dAddr, rID, rAddr, googleMapsClient) {
+  function findNearest(drivers, driver, dAddr, googleMapsClient) {
     console.log("Finding the nearest driver...");
     var inOneHour = Math.round((new Date().getTime() + 60 * 60 * 1000)/1000);
     googleMapsClient.directions({
         origin: dAddr,
-        destination: rAddr,
+        destination: req.session.rAddr,
         departure_time: inOneHour,
         mode: 'driving',
         traffic_model: 'best_guess'
@@ -85,16 +78,16 @@ module.exports.findDriver = function (req, res) {
                   minDistance = parseFloat(distances[key][2]);
                 }
               }
-              console.log(rID, rAddr,
+              console.log(req.session.rID, req.session.rAddr,
                 distances[minID][0], distances[minID][1], distances[minID][2], distances[minID][3]);
               // Save delivery info to delivery table
-              saveDelivery(rID, distances[minID], minID);
+              saveDelivery(distances[minID], minID);
             }
           }
       });
     }
 
-    function saveDelivery (rID, driver, driverID) {
+    function saveDelivery (driver, driverID) {
       console.log("Saving delievry information...");
       var today = new Date();
       var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
@@ -102,7 +95,7 @@ module.exports.findDriver = function (req, res) {
       var dest = req.body.destination;
       sql = 'INSERT INTO Delivery (rID, driverID, startTime, Date, Destination) \
               VALUE(?, ?, ?, ?, ?);';
-      value = [rID, driverID, time, date, dest];
+      value = [req.session.rID, driverID, time, date, dest];
       conn.query(sql, value, function (err, result) {
         if (err) { console.log('Inserting to Delivery Failed..'); }
         else {
@@ -123,7 +116,7 @@ module.exports.getTrackInfo = function (req, res) {
                d.orderId = p.orderId;';
   const value = [orderId]
   conn.query(sql, value, function (err, result) {
-    // If you are unable to find the order, re render the page with an error message.
+    // If you are unable to find the order, re-render the page with an error message.
     if (err || result.length == 0) {
       console.log("Couldn't find !");
       return res.render('trackPage', {message: "** Invalid order ID **"});
