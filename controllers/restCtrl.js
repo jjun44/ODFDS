@@ -4,14 +4,14 @@
  * 3/6/2019
  * CS160 - ODFDS Project
  * Restaurant controller that handles all the post requests
- * from the front-end side for restuarnat users.
+ * from the front-end side for restaurnat users.
  */
 
 const conn = require('./dbCtrl'); // Connection to the database.
 const socketApi = require('./socketApi');
 //const async = require("async");
 
-/** Gets restaurant and nearest driver information. */
+/** Gets request page with restaurant information. */
 module.exports.request = function (req, res) {
   // Find current user's address information.
   var sql = 'select Address, Latitude, Longitude, rID, r.LocationID from Restaurant r, \
@@ -20,25 +20,35 @@ module.exports.request = function (req, res) {
   var distances = {}; // to hold available drivers with distances to the restaurant
   conn.query(sql, value, function (err, result) {
     if (err) { return res.render('error', {msg:'Getting Address Failed'}); }
-    global.distances = {};
-    res.render('requestPage', { start:result[0].Address, lat:result[0].Latitude, lng:result[0].Longitude });
-    findDriver([result[0].Address, result[0].Latitude, result[0].Longitude, result[0].rID, result[0].LocationID]);
+
+    res.render('requestPage', { start:result[0].Address, rID:result[0].rID,
+                                lat:result[0].Latitude, lng:result[0].Longitude });
   });
+}
 
-  function findDriver (restaurant) {
-    // Find all available drivers.
-    sql = 'select driverID, Name, Phone, Latitude, Longitude from Driver d, \
-           Location lo where Working = 0 and Notification = \'ON\' and \
-           d.LocationID = lo.LocationID;';
-    conn.query(sql, function (err, drivers) {
-       // Convert Drivers' current latitudes and longitudes into Address.
-       for (const driver of drivers) {
-         geoToAddress(drivers, driver, restaurant, findNearest);
-       }
+/** Find the nearest driver and save delivery info to the database */
+module.exports.findDriver = function (req, res) {
+    console.log("Finding a driver...");
+    // Get restaurant info from the db
+    var sql = 'select rID, Address from Restaurant where uID = ?;';
+    var value = [req.session.uID];
+    conn.query(sql, value, function (err, result) {
+      if (err) { return res.render('error', {msg:'Database connection failed'}); }
+      global.distances = {};
+      // Find all available drivers.
+      sql = 'select driverID, Name, Phone, Latitude, Longitude from Driver d, \
+             Location lo where Working = 0 and Notification = \'ON\' and \
+             d.LocationID = lo.LocationID;';
+      conn.query(sql, function (err, drivers) {
+         // Convert Drivers' current latitudes and longitudes into Address.
+         for (const driver of drivers) {
+           geoToAddress(drivers, driver, result[0].rID, result[0].Address, findNearest);
+         }
+      });
     });
-  }
 
-  function geoToAddress(drivers, driver, restaurant, callback) {
+  function geoToAddress(drivers, driver, rID, rAddr, callback) {
+    console.log("Changing geolocation to address...");
     googleMapsClient = require('@google/maps').createClient({
         key: 'AIzaSyDNctnRjRSSJtY4Tq56wrRxowIxIGYh3zI',
       });
@@ -46,16 +56,17 @@ module.exports.request = function (req, res) {
        }, function(err, res) {
           if (!err) {
             // Find nearest driver
-            callback(drivers, driver, res.json.results[0].formatted_address, restaurant, googleMapsClient);
+            callback(drivers, driver, res.json.results[0].formatted_address, rID, rAddr, googleMapsClient);
         }
     });
   }
 
-  function findNearest(drivers, driver, dAddr, restaurant, googleMapsClient) {
+  function findNearest(drivers, driver, dAddr, rID, rAddr, googleMapsClient) {
+    console.log("Finding the nearest driver...");
     var inOneHour = Math.round((new Date().getTime() + 60 * 60 * 1000)/1000);
     googleMapsClient.directions({
         origin: dAddr,
-        destination: restaurant[0],
+        destination: rAddr,
         departure_time: inOneHour,
         mode: 'driving',
         traffic_model: 'best_guess'
@@ -74,20 +85,32 @@ module.exports.request = function (req, res) {
                   minDistance = parseFloat(distances[key][2]);
                 }
               }
-              console.log(restaurant[0], restaurant[1], restaurant[2],
+              console.log(rID, rAddr,
                 distances[minID][0], distances[minID][1], distances[minID][2], distances[minID][3]);
-              // Send driver information to the user
-              socketApi.driverInfo(distances[minID][0], distances[minID][1], distances[minID][2], distances[minID][3]);
               // Save delivery info to delivery table
-              //saveDelivery(restaurant, driverID);
+              saveDelivery(rID, distances[minID], minID);
             }
           }
       });
     }
-    function saveDelivery (restaurant, driverID) {
-      // rID, driverID, startTime, endTime, Date, Destination, destID into Delivery table
-      console.log("save Delievry");
-      //console.log(restaurant[3], driverID, new Time(), null, new Date(), restaurant[0], restaurant[4]);
+
+    function saveDelivery (rID, driver, driverID) {
+      console.log("Saving delievry information...");
+      var today = new Date();
+      var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+      var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+      var dest = req.body.destination;
+      sql = 'INSERT INTO Delivery (rID, driverID, startTime, Date, Destination) \
+              VALUE(?, ?, ?, ?, ?, ?);';
+      value = [rID, driverID, time, date, dest];
+      conn.query(sql, value, function (err, result) {
+        if (err) { console.log('Inserting to Delivery Failed..'); }
+        else {
+          console.log('\nInserting delivery info into the db done successfully.\n');
+          // Send driver and delivery info to the restuarant user
+          socketApi.sendDeliveryInfo(driver[0], driver[1], driver[2], driver[3], result.insertId);
+        }
+      });
     }
 }
 
