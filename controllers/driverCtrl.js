@@ -55,10 +55,12 @@ module.exports.getOrderHistory = function (req, res) {
       else {    // Orders are currently logged for the user.
         for (i = 0; i < result.length; i++) {
           console.log('orderID: ', result[i]);
-          const sql2 = 'select d.orderId, Name, Address, Destination, timeLeft, \
-             distanceLeft, price from Restaurant r, Delivery d, \
-             DeliveryStatus ds, Price p where d.orderId = ? and d.rId = r.rId \
-             and d.orderId = ds.orderId and d.orderId = p.orderId'
+
+          // Changed sql2
+          const sql2 = 'select d.orderId, Name, Address, Destination, totalTime, totalDistance, \
+              price from Restaurant r, Delivery d, \
+              Price p where d.orderId = ? and d.rId = r.rId \
+             and d.orderId = p.orderId'
           const ids = [result[i].orderID];
           conn.query(sql2, ids, function (err, result2) {
             if (err || result2.length == 0) {

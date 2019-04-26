@@ -105,7 +105,18 @@
             width: 70%;
             border-left: none;
             height: 730px;
+            animation: fadeEffect 1.1s;
         }
+                /* Fade in tabs */
+@-webkit-keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+@keyframes fadeEffect {
+  from {opacity: 0;}
+  to {opacity: 1;}
+}
+
     </style>
 </head>
 <body>
@@ -190,7 +201,7 @@
 
         var rName = document.createElement("P");
         rName.setAttribute("class", "lead");
-        text = document.createTextNode("Driver's Name: " + parseR[i][0].Name);
+        text = document.createTextNode("Driver's Name: " + parseR[i][0].dName);
         rName.appendChild(text);
 
         var reuse = document.createElement("P");
@@ -202,9 +213,11 @@
         dest.setAttribute("class", "lead");
         dest.appendChild(document.createTextNode("Destination: " + parseR[i][0].Destination));
 
+        //Changed total time
+
         var time = document.createElement("P");
         time.setAttribute("class", "lead");
-        time.appendChild(document.createTextNode("Total Time: " + parseR[i][0].timePassed));
+        time.appendChild(document.createTextNode("Total Time: " + parseR[i][0].totalTime));
 
         var price = document.createElement("P");
         price.setAttribute("class", "lead");

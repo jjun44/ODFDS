@@ -144,6 +144,7 @@
     }
     else {
         rData = rData.split("],");
+        alert(rData);
     }
     
  
@@ -154,7 +155,7 @@
         if (tester.charAt(tester.length - 1) != "]") {
             
             tester += "]";
-            
+
             
         }
         parseR.push(JSON.parse(tester));
@@ -196,7 +197,7 @@
         dest.appendChild(document.createTextNode("Destination: " + parseR[i][0].Destination));
         var time = document.createElement("P");
         time.setAttribute("class", "lead");
-        time.appendChild(document.createTextNode("Total Time: " + parseR[i][0].timeLeft));
+        time.appendChild(document.createTextNode("Total Time: " + parseR[i][0].totalTime));
         var price = document.createElement("P");
         price.setAttribute("class", "lead");
         price.appendChild(document.createTextNode("Total Price: $" + parseR[i][0].price));
