@@ -13,7 +13,7 @@ const driverCtrl = require("../controllers/driverCtrl");
 /* Get delivery page */
 router.get('/delivery', function(req, res, next) {
   if (req.session.loggedIn && req.session.type == 'Driver') {
-    res.render('deliverPage');
+    res.render('deliverPage', {dID: req.session.dID});
   } else {
     res.render('error', {msg:'Please login to view this page!'});
   }

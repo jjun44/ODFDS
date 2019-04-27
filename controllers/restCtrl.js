@@ -8,7 +8,10 @@
  */
 
 const conn = require('./dbCtrl'); // Connection to the database.
-const socketApi = require('./socketApi');
+const socketApi = require('./socketApi'); // Connection to socekt API.
+const googleMap = require('./googleMapApi'); // Connection to Google Map API.
+const pricePerMile = 2; // Charge $2 per mile.
+const pricePerMinute = .1; // Charge $0.1 per minute.
 //const async = require("async");
 
 /** Gets request page with restaurant information. */
@@ -28,35 +31,15 @@ module.exports.request = function (req, res) {
 /** Find the nearest driver and save delivery info to the database */
 module.exports.orderRequest = function (req, res) {
   console.log("Order request posted");
-  calcRoute();
+  googleMap.calcRoute(req.session.rAddr, req.body.destination, routeInfo);
   findDriver();
 
-  function calcRoute(callback) {
-    console.log("Calculating route...");
-    const pricePerMile = 2; // charge $2 per mile
-    const pricePerMinute = .1; // charge $0.1 per minute
-    var dest = req.body.destination;
-    var inOneHour = Math.round((new Date().getTime() + 60 * 60 * 1000)/1000);
-    googleMapsClient = require('@google/maps').createClient({
-        key: 'AIzaSyDNctnRjRSSJtY4Tq56wrRxowIxIGYh3zI',
-      });
-    googleMapsClient.directions({
-        origin: req.session.rAddr, // from restaurant
-        destination: dest, // to destination
-        departure_time: inOneHour,
-        mode: 'driving',
-        traffic_model: 'best_guess'
-      }, function(err, results) {
-          if (!err) {
-            var distance = results.json.routes[0].legs[0].distance.text;
-            var duration = results.json.routes[0].legs[0].duration.text;
-            var rName = req.session.rName;
-            var rAddr = req.session.rAddr;
-            var price = (parseFloat(distance) * pricePerMile + parseFloat(duration) * pricePerMinute).toFixed(2);
-            console.log(rName, rAddr, dest, distance, duration, price);
-            socketApi.sendOrderInfo(rName, rAddr, dest, distance, duration, price);
-          }
-      });
+  function routeInfo(distance, duration) {
+      var rName = req.session.rName;
+      var rAddr = req.session.rAddr;
+      var price = (parseFloat(distance) * pricePerMile + parseFloat(duration) * pricePerMinute).toFixed(2);
+      console.log(rName, rAddr, req.body.destination, distance, duration, price);
+      socketApi.sendOrderInfo(rName, rAddr, req.body.destination, distance, duration, price);
   }
 
   function findDriver() {
@@ -76,22 +59,19 @@ module.exports.orderRequest = function (req, res) {
 
   function geoToAddress(drivers, driver) {
     console.log("Changing geolocation to address...");
-    googleMapsClient = require('@google/maps').createClient({
-        key: 'AIzaSyDNctnRjRSSJtY4Tq56wrRxowIxIGYh3zI',
-      });
-    googleMapsClient.reverseGeocode({latlng: [driver.Latitude, driver.Longitude]
+    googleMap.mapClient.reverseGeocode({latlng: [driver.Latitude, driver.Longitude]
        }, function(err, res) {
           if (!err) {
             // Find nearest driver
-            findNearest(drivers, driver, res.json.results[0].formatted_address, googleMapsClient);
+            findNearest(drivers, driver, res.json.results[0].formatted_address);
         }
     });
   }
 
-  function findNearest(drivers, driver, dAddr, googleMapsClient) {
+  function findNearest(drivers, driver, dAddr) {
     console.log("Finding the nearest driver...");
     var inOneHour = Math.round((new Date().getTime() + 60 * 60 * 1000)/1000);
-    googleMapsClient.directions({
+    googleMap.mapClient.directions({
         origin: dAddr,
         destination: req.session.rAddr,
         departure_time: inOneHour,
@@ -284,10 +264,7 @@ module.exports.addUser = function (req, res) {
   function addLocation(userId) {
     sql = 'INSERT INTO Location (Latitude, Longitude) VALUE(?, ?);';
     // Convert address into latitude and Longitude
-    googleMapsClient = require('@google/maps').createClient({
-        key: 'AIzaSyDNctnRjRSSJtY4Tq56wrRxowIxIGYh3zI',
-     });
-    googleMapsClient.geocode({address: addr}, function(err, response) {
+    googleMap.mapClient.geocode({address: addr}, function(err, response) {
        if (!err) {
          const lat = response.json.results[0].geometry.location.lat;
          const lng = response.json.results[0].geometry.location.lng;

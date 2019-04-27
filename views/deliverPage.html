@@ -30,21 +30,13 @@
     <link rel="stylesheet" type="text/css" href="css/util.css">
     <link rel="stylesheet" type="text/css" href="css/main.css">
     <!--===============================================================================================-->
-
+    <script src = "/socket.io/socket.io.js"></script>
     <script>
-        function confirmDialog(){
-            if(confirm("You receive a delivery from xxxxxxxx")){
-                alert("Order accepted!");
-            }else{
-                alert("Order rejected. Waiting for next delivery ");
-            }
-        }
-
-
-
-
+    function sendDriverInfo() {
+      var socket = io();
+      socket.emit('saveUserInfo', 'D', document.getElementById('dID').innerHTML);
+    }
     </script>
-
 </head>
 
 <body style="background-color: #999999;">
@@ -56,18 +48,16 @@
             	<span class="login100-form-title p-b-20">
 						Delivery Page
 					</span>
-            <span class="label-input100"><font size="5">Start to receive delivery</font></span>
-            <br><br>
-            <form class="login100-form validate-form" action = "" method="post">
-
-
-                    <input type="radio" name="ready" value="" checked>
+            <p class="label-input100"><font size="5">Driver ID: <span id="dID">{{dID}}</font></p><br><br>
+            <p class="label-input100"><font size="5">Start to receive delivery</font></p>
+            <br>
+            <form class="login100-form validate-form" method="post">
+                    <input type="radio" name="ready" checked>
                 <span><font size="4"><b>OFF</b></font></span><br>
-                    <input type="radio" name="ready" value="" onclick="confirmDialog()">
+                    <input type="radio" name="ready" onclick="sendDriverInfo()">
                 <span><font size="4"><b>ON</b></font></span><br>
-
             </form>
-		<br> <br> <br> <br> <br> <br> <br>
+		<br> <br> <br>
             <br>
             <div class="container-login100-form-btn">
                 <div class="wrap-login100-form-btn" align="center">

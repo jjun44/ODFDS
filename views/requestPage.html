@@ -133,7 +133,9 @@
     <!-- Server will send the nearest driver information to the user dynamically -->
     <script src = "/socket.io/socket.io.js"></script>
     <script>
+    function getResult() {
       var socket = io();
+      socket.emit('saveUserInfo', 'R', document.getElementById('rID').innerHTML);
       socket.on('orderInfo', function(data) {
         document.getElementById("result").style.visibility = 'visible';
         document.getElementById("dest").innerHTML = document.getElementById('destination').value;
@@ -151,6 +153,7 @@
         document.getElementById("arrivesIn").innerHTML = data.arrivesIn;
         document.getElementById("orderID").innerHTML = data.orderID;
       });
+    }
       //}, 2000);
     </script>
 </div>
@@ -169,7 +172,7 @@
             <div class="container-login100-form-btn">
                 <div class="wrap-login100-form-btn">
                     <div class="login100-form-bgbtn"></div>
-                    <button id="request" class="login100-form-btn">
+                    <button id="request" class="login100-form-btn" onclick="getResult()">
                         Request
                     </button>
                 </div>
