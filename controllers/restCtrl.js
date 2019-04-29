@@ -165,9 +165,34 @@ module.exports.saveOrder = function (rID, dID, dest, dist, duration, price) {
       console.log('Inserting delivery info into the db done successfully.');
       socketApi.sendOrderID(result.insertId); // Send order ID to the restaurant user.
       savePrice(result.insertId); // Save price infomration.
+      changeDriverLoc(rID, dID);
     }
   });
-
+  /**
+   * Once driver accepts order, his current location will
+   * be changed to the restaurant location.
+   * @param {string} rID restaurant ID
+   * @param {string} dID driver ID
+   */
+  function changeDriverLoc(rID, dID) {
+    // Gets restaurant's geo location information.
+    sql = 'SELECT r.LocationID, Latitude, Longitude FROM Location l, Restaurant r \
+           WHERE r.rID = ? AND r.LocationID = l.LocationID;';
+    conn.query(sql, rID, function(err, location) {
+      if (err) { console.log('DB connection Failed (changeDriverLoc)..'); }
+      else {
+        // Change driver's current location to the restaurant address.
+        sql = 'UPDATE Driver SET LocationID = ? WHERE driverID = ?;';
+        value = [location[0].LocationID, dID];
+        conn.query(sql, value, function(err, result) {
+          if (err) { console.log("Updating Driver's location failed..."); }
+          else {
+            console.log("Driver's location changed to Restaurant Address.");
+          }
+        });
+      }
+    });
+  }
   /**
    * Saves price information to the Price table in the database.
    * @param {string} orderID order ID created from the Delivery table.
@@ -188,10 +213,9 @@ module.exports.saveOrder = function (rID, dID, dest, dist, duration, price) {
 /** Gets tracking information by the oder ID. */
 module.exports.getTrackInfo = function (req, res) {
   const orderId = req.body.orderId;
-  const sql = 'select d.orderId, Destination, distanceLeft, \
-               timePassed, timeLeft, price from Delivery d, DeliveryStatus ds, \
-               Price p where d.orderId = ? and d.orderId = ds.orderId and \
-               d.orderId = p.orderId;';
+  var sql = 'select d.orderID, Address, Destination, totalDistance, \
+             totalTime, Price from Delivery d, Restaurant r, Price p \
+             where d.orderID = ? and d.orderID = p.orderID and d.rID = r.rID;';
   const value = [orderId]
   conn.query(sql, value, function (err, result) {
     // If you are unable to find the order, re-render the page with an error message.
@@ -200,11 +224,11 @@ module.exports.getTrackInfo = function (req, res) {
       return res.render('trackPage', {message: "** Invalid order ID **"});
     } else {
       return res.render('trackPage', {orderId: result[0].orderId,
-                                      destination: result[0].Destination,
-                                      disLeft: result[0].distanceLeft,
-                                      timePassed: result[0].timePassed,
-                                      timeLeft: result[0].timeLeft,
-                                      price: result[0].price});
+                                      rAddr: result[0].Address,
+                                      dest: result[0].Destination,
+                                      dist: result[0].totalDistance,
+                                      time: result[0].totalTime,
+                                      price: result[0].Price});
     }
   });
 }
