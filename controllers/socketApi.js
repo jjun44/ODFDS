@@ -7,6 +7,7 @@
  */
 
 var socket_io = require('socket.io');
+var restCtrl = require('./restCtrl');
 var io = socket_io();
 var socketApi = {};
 var users = {}; // Holds online users
@@ -14,42 +15,84 @@ socketApi.io = io;
 
 io.on('connection', function(socket){
   /**
-   * Save user information sent from the user.
+   * Saves user information sent from the user.
    * @param {string} type user type either R (Restaurant) or D (Driver)
    * @param {string} userId user ID either rID or driverID
    */
   socket.on('saveUserInfo', function(type, userId) {
     users[userId] = {'Type': type, 'SocketID': socket.id};
-    console.log('(', type, ')', userId,  ': user connected');
+    console.log('(', type, ')', userId,  ': user connected (', socket.id, ')');
   });
-  /** Delete disconnected user info from users. */
+
+  /** Deletes disconnected user info from the online user list. */
   socket.on('disconnect', function () {
-    deleteUser();
-    function deleteUser() {
-      // Find user ID by socket ID and delete the user.
-      for (key in users) {
-        if (users[key].SocketID == socket.id) {
-          console.log('(', users[key].Type, ')', key, ': user disconnected');
-          delete users[key];
-        }
+    // Find user ID by socket ID and delete the user.
+    for (key in users) {
+      if (users[key].SocketID == socket.id) {
+        console.log('(', users[key].Type, ')', key, ': user disconnected');
+        delete users[key];
       }
     }
   });
 
-  //socket.emit('orderInfo', {rName: 'TestRest', rAddr: 'TestAddr'});
+  /**
+   * When order accepted by a driver, driver infomration will be sent to
+   * the restaurant user requested.
+   * @param {string} dID driver ID
+   * @param {string} rID restaurnt ID
+   * @param {string} dest delivery destination
+   * @param {string} time delivery duration
+   * @param {string} price delievery price
+   * @param {string} dName driver's name
+   * @param {string} dPhone driver's phone number
+   * @param {string} distToRest distance from driver's loc to restaurant
+   * @param {string} timeToRest travel time from driver's loc to restaurnt
+   */
+  socket.on('orderAccepted', function(dID, rID, dest, dist, time, price, dName, dPhone, distToRest, timeToRest) {
+    // Send driver info to the restaurant user.
+    io.to(users[rID].SocketID).emit('driverInfo', { dID: dID, dName: dName,
+                  dPhone: dPhone, distance: distToRest, arrivesIn: timeToRest });
+    // Save order information to the database.
+    restCtrl.saveOrder(rID, dID, dest, dist, time, price);
+  });
 });
 
-socketApi.sendOrderInfo = function(rName, rAddr, dest, distance, duration, price) {
-  console.log('Sending order information to a user...');
-  io.sockets.emit('orderInfo', { rName: rName, rAddr: rAddr, dest: dest,
-                                   distance: distance, duration: duration, price: price });
+/**
+ * Sends an error message to users.
+ * @param {string} errMsg error message.
+ */
+socketApi.sendErrMsg = function(errMsg) {
+  io.sockets.emit('err', { errMsg: errMsg });
 }
 
-socketApi.sendDriverInfo = function(dName, dPhone, distance, arrivesIn, orderID) {
-  console.log('Sending delivery information to a restaurant user...');
-  io.sockets.emit('driverInfo', { dName: dName, dPhone: dPhone,
-                                   distance: distance, arrivesIn: arrivesIn,
-                                   orderID: orderID });
+/**
+ * Sends route information to users.
+ * @param {string} rID restaurnt ID
+ * @param {string} rName restaurnt name
+ * @param {string} rAddr restaurnt address
+ * @param {string} dest delivery destination
+ * @param {Object} order order information including distance, time, and price
+ * @param {Object} driver nearest driver information
+ */
+socketApi.sendRouteInfo = function(rID, rName, rAddr, dest, order, driver) {
+  /* Send order information to restaurant users.  */
+  io.sockets.emit('orderInfoToR', { rName: rName, rAddr: rAddr, dest: dest,
+                                    distance: order.dist, duration: order.time, price: order.price });
+  /* Send order information to driver users.  */
+  if (driver !== null) {
+    io.to(users[driver.id].SocketID).emit('orderInfoToD', { rID: rID, rName: rName, rAddr: rAddr, dest: dest,
+                                      distance: order.dist, duration: order.time, price: order.price,
+                                      dID: driver.id, dName: driver.name, dPhone: driver.phone,
+                                      distToRest: driver.distToRest, timeToRest: driver.timeToRest });
+  }
+}
+
+/**
+ * Sends order ID information to users.
+ * @param {string} orderID orderID created from the database.
+ */
+socketApi.sendOrderID = function(orderID) {
+  io.sockets.emit('orderID', { orderID: orderID });
 }
 
 module.exports = socketApi;

@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -102,9 +100,15 @@
       directionsDisplay.setMap(map);
       // When button clicked, show route from start to end.
       var onChangeHandler = function() {
+        // Initialize results in the last search.
+        document.getElementById("errMsg").innerHTML = '';
+        document.getElementById("routeInfo").style.visibility = 'hidden';
+        document.getElementById("findingDriver").style.visibility = 'hidden';
+        document.getElementById("driverInfo").style.visibility = 'hidden';
+        document.getElementById("waitMsg").innerHTML = 'Finding a driver ...';
         displayRoute(directionsService, directionsDisplay);
       };
-      // Event listeners for the request button.
+      // Event listener for the request button.
       document.getElementById('request').addEventListener('click', onChangeHandler);
     }
     /** Display route from start to end on Map. */
@@ -130,31 +134,40 @@
     <script asyn defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBdB1kiL0pp6mB4jv_yqs0q9Oiuett2cbs&callback=initMap">
     </script>
-    <!-- Server will send the nearest driver information to the user dynamically -->
+    <!-- Server will send the order and nearest driver information to the user dynamically -->
     <script src = "/socket.io/socket.io.js"></script>
     <script>
     function getResult() {
       var socket = io();
+      /** Sends restaurnt ID to the server. */
       socket.emit('saveUserInfo', 'R', document.getElementById('rID').innerHTML);
-      socket.on('orderInfo', function(data) {
-        document.getElementById("result").style.visibility = 'visible';
+      /** Receives error message if any from the server. */
+      socket.on('err', function(data) {
+        document.getElementById("errMsg").innerHTML = data.errMsg;
+      });
+      /** Receives order infomration from the server. */
+      socket.on('orderInfoToR', function(data) {
+        document.getElementById("routeInfo").style.visibility = 'visible';
+        document.getElementById("findingDriver").style.visibility = 'visible';
         document.getElementById("dest").innerHTML = document.getElementById('destination').value;
         document.getElementById("distance").innerHTML = data.distance;
         document.getElementById("time").innerHTML = data.duration;
         document.getElementById("price").innerHTML = '$' + data.price;
       });
-      //setTimeout(function(){
+      /** Receives order ID from the server.  */
+      socket.on('orderID', function(data) {
+        document.getElementById("orderID").innerHTML = data.orderID;
+      });
+      /** Receives driver infomration from the server.  */
       socket.on('driverInfo', function(data){
-        //document.getElementById("waitMsg").style.visibility = 'hidden';
-        //document.getElementById("driverInfo").style.visibility = 'visible';
+        document.getElementById("waitMsg").innerHTML = 'Driver Found!';
+        document.getElementById("driverInfo").style.visibility = 'visible';
         document.getElementById("dName").innerHTML = data.dName;
         document.getElementById("dPhone").innerHTML = data.dPhone;
         document.getElementById("dDistance").innerHTML = data.distance;
         document.getElementById("arrivesIn").innerHTML = data.arrivesIn;
-        document.getElementById("orderID").innerHTML = data.orderID;
       });
     }
-      //}, 2000);
     </script>
 </div>
 <div class="split right">
@@ -164,6 +177,7 @@
 						Request a Driver
 					</span>
             <br><br><br>
+            <p id="errMsg"></p>
             <div class="wrap-input100 validate-input" data-validate="Destination is required">
                 <span class="login50-form-title p-b-20">Enter the Destination</span>
                 <input class="input100" type="text" id="destination" name="destination" placeholder="Destination...">
@@ -178,7 +192,7 @@
                 </div>
             </div>
 		<br><br><br>
-            <div id="result" style="visibility:hidden; margin-top:20px; padding-top:30px; padding-bottom:30px;" class="jumbotron">
+            <div id="routeInfo" style="visibility:hidden; margin-top:20px; padding-top:30px; padding-bottom:30px;" class="jumbotron">
               <h3 class="display-6" style="color:#1C2833">Restaurant ID: <span id="rID">{{rID}}</span></h3>
               <hr class="my-4">
               <h4 class="display-8" style="color:#1C2833">Route</h4>
@@ -187,7 +201,11 @@
               <p class="lead">Distance: <span id="distance"></span></p>
               <p class="lead">Estimated Time: <span id="time"></span></p>
               <p class="lead">Price: <span id="price"></span></p>
+              <hr class="my-4"></div>
+            <div id="findingDriver" style="visibility:hidden; margin-top:10px; padding:30px 50px 30px 50px;" class="jumbotron">
+              <h4 id="waitMsg" class="display-8" style="color:#1C2833">Finding a driver ...</h4>
               <hr class="my-4">
+              <div id="driverInfo" style="visibility:hidden;">
               <h3 class="display-6" style="color:#1C2833">Order ID: <span id="orderID"></span></h3>
               <hr class="my-4">
               <h4 class="display-8" style="color:#1C2833">Driver Information</h4>
@@ -195,7 +213,7 @@
               <p class="lead">Phone: <span id="dPhone"></span></p>
               <p class="lead">How far away: <span id="dDistance"></span></p>
               <p class="lead">Arrives in: <span id="arrivesIn"></span></p>
-            </div>
+              <hr class="my-4"></div></div>
         </form>
         <div class="container-login100-form-btn">
             <div class="wrap-login100-form-btn" align="center">

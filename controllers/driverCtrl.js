@@ -18,9 +18,9 @@ module.exports.getDeliveryInfo = function (req, res) {
                and d.orderId = ds.orderId and d.orderId = p.orderId'
   const value = [orderId]
   conn.query(sql, value, function (err, result) {
-    if (err || result.length == 0) 
-    { 
-      console.log("Couldn't find!"); 
+    if (err || result.length == 0)
+    {
+      console.log("Couldn't find!");
       res.render('deliverInfo', {message: "** Invalid order ID **"});
     }
     else {
@@ -34,7 +34,6 @@ module.exports.getDeliveryInfo = function (req, res) {
   })
 }
 
-
 module.exports.getOrderHistory = function (req, res) {
   // If the user is logged into the website.
 
@@ -45,7 +44,7 @@ module.exports.getOrderHistory = function (req, res) {
     // Checks for any orders from the current driver profile.
     const sql = 'select orderID \
                 from Delivery \
-                Where driverID in (Select driverID from Driver Where uID = ?)'           
+                Where driverID in (Select driverID from Driver Where uID = ?)'
     const value = [req.session.uID];
     conn.query(sql, value, function (err, result) {
       if (err || result.length == 0) {
@@ -77,15 +76,18 @@ module.exports.getOrderHistory = function (req, res) {
                 }
               }
             })
-          
-        }     
+
+        }
       }
     })
   }
 }
 
-
-/** Adds driver user infomration to User/Driver tables. */
+/**
+ * Gets driver user information from the user,
+ * validates the user info, and saves information
+ * to User/Driver tables.
+ */
 module.exports.addUser = function (req, res) {
   // Get user information from the driver signup page.
   const email = req.body.email;
@@ -106,8 +108,6 @@ module.exports.addUser = function (req, res) {
   var mEmail = false;
 
   validateSignUp();
-
-
   /*
     This function will be responsible for validating each input field of the page.
   */
@@ -118,10 +118,10 @@ module.exports.addUser = function (req, res) {
     var passMess = "";
     var dup = "";
 
-    
+
     // If any of the fields are null, return an error message.
     if ((email.length == 0 || !email.includes("@") || !email.includes(".com")) || (pwd.length == 0 || pwd != rPwd) || name.length ==0 ||
-    	license.length ==0 || (phone.length == 0 || phone.length != 10) || (bank.length == 0 || bank.length != 16)) 
+    	license.length ==0 || (phone.length == 0 || phone.length != 10) || (bank.length == 0 || bank.length != 16))
     {
     	if (pwd.length < 4) {
     		passMess = "Password must be at least 4 characters";
@@ -131,7 +131,7 @@ module.exports.addUser = function (req, res) {
     	error = true;
     	console.log("Missing Sign up information");
     	emailMess = "** Invalid information.  "
-    } 
+    }
 
     // Query for checking if the email already exists
     const eQuery = 'Select Email from User \

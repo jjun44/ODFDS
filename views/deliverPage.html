@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,15 +30,72 @@
     <!--===============================================================================================-->
     <script src = "/socket.io/socket.io.js"></script>
     <script>
+    /** Sends driver ID info to the server. */
+    var socket = io();
     function sendDriverInfo() {
-      var socket = io();
       socket.emit('saveUserInfo', 'D', document.getElementById('dID').innerHTML);
+      getRequest();
+    }
+    /** Gets order requests from restaurants on real-time. */
+    var orderNum = 0;
+    function getRequest() {
+      // Receives order information.
+      socket.on('orderInfoToD', function(data) {
+        document.getElementById("requests").innerHTML +=
+                  '<input type="radio" name="order" value="order' + orderNum + '">' +
+                  '<p>Restaurant ID: <span id="rID' + orderNum + '">' + data.rID + '</span></p>' +
+                  '<p>Restaurant Name: <span id="rName' + orderNum + '">' + data.rName + '</span></p>' +
+                  '<p>Restaurant Address: <span id="rAddr' + orderNum + '">' + data.rAddr + '</span></p>' +
+                  '<p>Distance to Restaurant: <span id="distToRest' + orderNum + '">' + data.distToRest + '</span></p>' +
+                  '<p>Destination: <span id="dest' + orderNum + '">' + data.dest + '</span></p>' +
+                  '<p>Delivery Distance: <span id="dist' + orderNum + '">' + data.distance + '</span></p>' +
+                  '<p>Delivery Duration: <span id="time' + orderNum + '">' + data.duration + '</span></p>' +
+                  '<p>Price: $<span id="price' + orderNum + '">' + data.price + '</span></p>' +
+                  '<hr class="my-4">';
+        // Order information that will be hidden but used when sending info back to the server.
+        document.getElementById("hiddenInfo").innerHTML +=
+                  '<p>Driver Name: <span id="dName' + orderNum + '">' + data.dName + '</span></p>' +
+                  '<p>Driver Phone: <span id="dPhone' + orderNum + '">' + data.dPhone + '</span></p>' +
+                  '<p>Duration to Restaurant: <span id="timeToRest' + orderNum + '">' + data.timeToRest + '</span></p>' +
+                  '<hr class="my-4">';
+        orderNum += 1;
+        // Create accept button when at least one request posted, if not created yet.
+        if (document.getElementById("acceptB").innerHTML.length == 0 &&
+            document.getElementById("requests").innerHTML.length != 0) {
+              document.getElementById("acceptB").innerHTML +=
+                              '<div class="wrap-login100-form-btn" align="center">' +
+                              '<div class="login100-form-bgbtn"></div>' +
+                              '<button id="accept" class="login100-form-btn" onclick="acceptOrder()">Accept</button>'
+        }
+      });
+    }
+    /**
+     * When the driver chooses and accepts an order,
+     * all the order information will be sent back to the server.
+     */
+    function acceptOrder() {
+      var options = document.getElementsByName('order');
+      // Find the selected order and send the corresponding order info to the server.
+      for (var i = 0; i < options.length; i++){
+        if (options[i].checked) {
+          var submit = function (rID, dest, dist, time, price, dName, dPhone, distToRest, timeToRest) {
+            socket.emit('orderAccepted',
+                    document.getElementById("dID").innerHTML, document.getElementById(rID).innerHTML,
+                    document.getElementById(dest).innerHTML, document.getElementById(dist).innerHTML,
+                    document.getElementById(time).innerHTML, document.getElementById(price).innerHTML,
+                    document.getElementById(dName).innerHTML, document.getElementById(dPhone).innerHTML,
+                    document.getElementById(distToRest).innerHTML, document.getElementById(timeToRest).innerHTML);
+            window.alert('Order Accepted!');
+          }
+          submit('rID' + i, 'dest' + i, 'dist' + i, 'time' + i, 'price' + i,
+                 'dName' + i, 'dPhone' + i, 'distToRest' + i, 'timeToRest' + i);
+          break;
+        }
+      }
     }
     </script>
 </head>
-
 <body style="background-color: #999999;">
-
 <div class="limiter">
     <div class="container-login100">
         <div class="login100-more" style="background-image: url('images/SignUpPage.jpg');"></div>
@@ -51,13 +106,16 @@
             <p class="label-input100"><font size="5">Driver ID: <span id="dID">{{dID}}</font></p><br><br>
             <p class="label-input100"><font size="5">Start to receive delivery</font></p>
             <br>
-            <form class="login100-form validate-form" method="post">
-                    <input type="radio" name="ready" checked>
-                <span><font size="4"><b>OFF</b></font></span><br>
-                    <input type="radio" name="ready" onclick="sendDriverInfo()">
-                <span><font size="4"><b>ON</b></font></span><br>
+            <input type="radio" name="ready" id="off" checked>
+              <span><font size="4"><b>OFF</b></font></span>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="radio" name="ready" onclick="sendDriverInfo()">
+              <span><font size="4"><b>ON</b></font></span>
+            <br><hr class="my-4">
+            <form class="login100-form validate-form">
+                <div id='requests'></div>
+                <div id='acceptB' class="container-login100-form-btn"></div>
             </form>
-		<br> <br> <br>
             <br>
             <div class="container-login100-form-btn">
                 <div class="wrap-login100-form-btn" align="center">
@@ -68,8 +126,7 @@
         </div>
     </div>
 </div>
-
-
+<div id='hiddenInfo' style="visibility:hidden;"></div>
 <!--===============================================================================================-->
 <script src="vendor/jquery/jquery-3.2.1.min.js"></script>
 <!--===============================================================================================-->
@@ -86,6 +143,5 @@
 <script src="vendor/countdowntime/countdowntime.js"></script>
 <!--===============================================================================================-->
 <script src="js/main.js"></script>
-
 </body>
 </html>
