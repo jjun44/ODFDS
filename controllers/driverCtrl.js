@@ -217,8 +217,8 @@ module.exports.addUser = function (req, res) {
    */
   function addDriver(userId) {
     sql = 'INSERT INTO Driver (uID, Name, License, Phone, \
-          BankAccount, Working) VALUE(?, ?, ?, ?, ?, ?);';
-    value = [userId, name, license, phone, bank, working];
+          BankAccount, Working, Notification) VALUE(?, ?, ?, ?, ?, ?, ?,);';
+    value = [userId, name, license, phone, bank, working, 'OFF', 1001];
     conn.query(sql, value, function (err, result) {
       if (err) { console.log('Inserting to Location Failed'); }
       else {

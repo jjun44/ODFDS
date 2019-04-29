@@ -88,6 +88,10 @@ module.exports.orderRequest = function (req, res) {
     sql = 'SELECT driverID, Name, Phone, Latitude, Longitude FROM Driver d, \
            Location lo WHERE Working = 0 and Notification = \'ON\' AND \
            d.LocationID = lo.LocationID;';
+    /*sql = 'SELECT driverID, Name, Phone, Latitude, Longitude FROM Driver d, \
+          Location lo WHERE (d.driverID IN (SELECT driverID from Delivery del, \
+          Restaurant res, Driver dr WHERE del.rID = res.rID and dr.Working = 1 and dr.Notification = \‘ON\’)) \
+          OR (Working = 0) and Notification = \‘ON\’ AND d.LocationID = lo.LocationID ;'; */
     conn.query(sql, function (err, drivers) {
        // For each available driver, covert lat/lng to address and find nearest driver.
        for (const driver of drivers) {

@@ -141,10 +141,6 @@
       var socket = io();
       /** Sends restaurnt ID to the server. */
       socket.emit('saveUserInfo', 'R', document.getElementById('rID').innerHTML);
-      /** Receives error message if any from the server. */
-      socket.on('err', function(data) {
-        document.getElementById("errMsg").innerHTML = data.errMsg;
-      });
       /** Receives order infomration from the server. */
       socket.on('orderInfoToR', function(data) {
         document.getElementById("routeInfo").style.visibility = 'visible';
@@ -153,6 +149,11 @@
         document.getElementById("distance").innerHTML = data.distance;
         document.getElementById("time").innerHTML = data.duration;
         document.getElementById("price").innerHTML = '$' + data.price;
+      });
+      /** Receives error message if any from the server. */
+      socket.on('err', function(data) {
+        document.getElementById("errMsg").innerHTML = data.errMsg;
+        document.getElementById("findingDriver").style.visibility = 'hidden';
       });
       /** Receives order ID from the server.  */
       socket.on('orderID', function(data) {
@@ -219,8 +220,8 @@
               <p class="lead">Arrives in: <span id="arrivesIn"></span></p>
               <hr class="my-4"></div></div>
         </form>
- 
-    
+
+
         <p style="visibility:hidden;"><span id="lat">{{lat}}</span><span id="lng">{{lng}}</span></p>
       </div>
 </div>
