@@ -14,7 +14,7 @@ module.exports.getDeliveryInfo = function (req, res) {
   const orderId = req.body.orderId;
   const sql = 'select d.orderID, Name, Address, Destination, totalDistance, \
                totalTime, Price from Delivery d, Restaurant r, Price p \
-               where d.orderID = 10105 and d.orderID = p.orderID and d.rID = r.rID;';
+               where d.orderID = ? and d.orderID = p.orderID and d.rID = r.rID;';
   var value = [orderId]
   conn.query(sql, value, function (err, result) {
     if (err || result.length == 0)
