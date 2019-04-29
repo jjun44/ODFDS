@@ -213,22 +213,28 @@ module.exports.saveOrder = function (rID, dID, dest, dist, duration, price) {
 /** Gets tracking information by the oder ID. */
 module.exports.getTrackInfo = function (req, res) {
   const orderId = req.body.orderId;
-  var sql = 'select d.orderID, Address, Destination, totalDistance, \
-             totalTime, Price from Delivery d, Restaurant r, Price p \
-             where d.orderID = ? and d.orderID = p.orderID and d.rID = r.rID;';
-  const value = [orderId]
+  var sql = 'select dr.driverID, d.orderID, Address, Destination, Latitude, Longitude, \
+             totalDistance, totalTime, Price from Delivery d, Restaurant r, \
+             Price p, Location l, Driver dr where d.orderID = ? and \
+             d.orderID = p.orderID and d.rID = r.rID and dr.driverID = d.driverID \
+             and l.LocationID = dr.LocationID;';
+  const value = [orderId];
   conn.query(sql, value, function (err, result) {
     // If you are unable to find the order, re-render the page with an error message.
     if (err || result.length == 0) {
       console.log("Couldn't find !");
       return res.render('trackPage', {message: "** Invalid order ID **"});
     } else {
-      return res.render('trackPage', {orderId: result[0].orderId,
+
+      return res.render('trackPage', {orderId: result[0].orderID,
+                                      dID: result[0].driverID,
                                       rAddr: result[0].Address,
                                       dest: result[0].Destination,
                                       dist: result[0].totalDistance,
                                       time: result[0].totalTime,
-                                      price: result[0].Price});
+                                      price: result[0].Price,
+                                      lat: result[0].Latitude,
+                                      lng: result[0].Longitude });
     }
   });
 }

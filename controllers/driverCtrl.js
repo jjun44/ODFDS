@@ -8,6 +8,47 @@
  */
 
 const conn = require('./dbCtrl'); // Connection to the database.
+const socketApi = require('./socketApi');
+const googleMap = require('./googleMapApi');
+
+module.exports.trackRoute = function (lat, lng, destination) {
+  googleMap.mapClient.reverseGeocode({latlng: [lat, lng]
+     }, function(err, res) {
+        if (!err) {
+          var dAddr = res.json.results[0].formatted_address; // Converted address.
+          // Sends distance and duration to the user.
+          var route = function (distance, duration) {
+              socketApi.trackRouteInfo(distance, duration);
+          }
+          // Caluclate distance/duration from driver to the destination.
+          googleMap.calcRoute(dAddr, destination, route);
+      }
+  });
+}
+
+/**
+ * Update driver's current location.
+ * @param {string} dID driver ID
+ * @param {string} lat driver's current latitude
+ * @param {string} lng driver's current longitude
+ */
+module.exports.updateLocation = function(dID, lat, lng) {
+  // New location info added to the Location table.
+  var sql = 'INSERT into Location (Latitude, Longitude) VALUE(?, ?);';
+  var value = [lat, lng];
+  conn.query(sql, value, function (err, result) {
+    if (err) { console.log("Inserting to Location Failed."); }
+    else {
+      // Update driver's location ID.
+      sql = 'UPDATE Driver SET LocationID = ? WHERE driverID = ?;';
+      value = [result.insertId, dID];
+      conn.query(sql, value, function (err, res) {
+        if (err) { console.log("Updating driver location failed"); }
+        else { console.log("Driver's current location updated."); }
+      });
+    }
+  });
+}
 
 /** Gets delivery information by the oder ID. */
 module.exports.getDeliveryInfo = function (req, res) {

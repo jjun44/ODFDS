@@ -8,6 +8,7 @@
 
 var socket_io = require('socket.io');
 var restCtrl = require('./restCtrl');
+var driverCtrl = require('./driverCtrl');
 var io = socket_io();
 var socketApi = {};
 var users = {}; // Holds online users
@@ -55,6 +56,12 @@ io.on('connection', function(socket){
     // Save order information to the database.
     restCtrl.saveOrder(rID, dID, dest, dist, time, price);
   });
+
+  socket.on('driverLoc', function(driverID, latlng, destination) {
+    console.log(driverID, latlng.lat, latlng.lng);
+    driverCtrl.updateLocation(driverID, latlng.lat, latlng.lng);
+    driverCtrl.trackRoute(latlng.lat, latlng.lng, destination);
+  });
 });
 
 /**
@@ -65,6 +72,10 @@ socketApi.sendErrMsg = function(errMsg) {
   io.sockets.emit('err', { errMsg: errMsg });
 }
 
+socketApi.trackRouteInfo = function(distance, duration) {
+  console.log(distance, duration);
+  io.sockets.emit('trackRoute', { distLeft: distance, timeLeft: duration });
+}
 /**
  * Sends route information to users.
  * @param {string} rID restaurnt ID
