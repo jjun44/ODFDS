@@ -390,14 +390,16 @@ iframe {
   align-items: center;
 }
 
+
 .wrap-login100-form-btn {
   display: block;
   position: relative;
   z-index: 1;
   border-radius: 25px;
   overflow: hidden;
+  width: 180px;
+  text-align: center;
 }
-
 .login100-form-bgbtn {
   position: absolute;
   z-index: -1;
