@@ -129,8 +129,7 @@
                         <button class="login100-form-btn" onclick="window.location.href='/rest'">Go Back</button>
                       </div>
                     </div>
-                </div>
-            <br>
+            <br><br><br>
             <div id="result" class="jumbotron">
                 <h3 class="display-6" style="color:black;">Order ID: {{orderId}}</h3>
                 <p class="lead">Driver ID: <span id="dID">{{dID}}</span></p>
@@ -141,22 +140,22 @@
                 <p class="lead">Total Price: {{price}}</p>
                 <hr class="my-4">
                 <p class="lead"></p>
-                <!--<p class="lead">Distance Left: <span id="distLeft">{{distLeft}}</span></p>-->
-                <!--<p class="lead">Time Left: <span id="timeLeft">{{timeLeft}}</span></p>-->
+                <!--<p class="lead">Distance Left: <span id="distLeft">{{distLeft}}</span></p>
+                <p class="lead">Time Left: <span id="timeLeft">{{timeLeft}}</span></p>-->
                 <hr class="my-4">
-            </div></form>
+            </div></form></div>
             <br><br><br>
         </div>
         <p style="visibility:hidden;"><span id="lat">{{lat}}</span><span id="lng">{{lng}}</span></p>
     </div>
-    <script type="text/javascript" src="script1.js"></script>
-    <script type ="text/javascript" src="script2.js"></script>
+    <script type="text/javascript" src="js/script1.js"></script>
+    <script type ="text/javascript" src="js/script2.js"></script>
 
     <!--<script type ="text/javascript" src="./MapExtension.js"></script>-->
-    <script src="script3.js" type="text/javascript"></script>
+    <script src="js/script3.js" type="text/javascript"></script>
     <script src = "/socket.io/socket.io.js"></script>
     <script type="text/javascript">
-            var map;
+        var map;
         var directionDisplay;
         var directionsService;
         var stepDisplay;
@@ -179,10 +178,13 @@
         var nextPanoId;
 
         var startLoc = new Array();
-        startLoc[0] =  document.getElementById('startLoc') 
+        //startLoc[0] = 'In n out, San Jose';
+        //window.alert(document.getElementById('rAddr').innerHTML, document.getElementById('end').innerHTML);
+        startLoc[0] = document.getElementById('rAddr').innerHTML;
 
         var endLoc = new Array();
-        endLoc[0] = document.getElementById('endLoc')
+        //endLoc[0] = 'San Jose State University';
+        endLoc[0] = document.getElementById('end').innerHTML;
 
 
 
@@ -193,7 +195,7 @@
 
             infowindow = new google.maps.InfoWindow(
                 {
-                    size: new google.maps.Size(150,50) 
+                    size: new google.maps.Size(150,50)
                 });
 
             var myOptions = {
@@ -202,13 +204,22 @@
             }
             map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 
-           
+
 
             address = 'San Jose'
             geocoder = new google.maps.Geocoder();
             geocoder.geocode( { 'address': address}, function(results, status) {
                 map.fitBounds(results[0].geometry.viewport);
 
+            });
+            // Change driver's current geo location to address.
+            var dLat = document.getElementById('lat').innerHTML;
+            var dLng = document.getElementById('lng').innerHTML;
+            var latlng = {lat: parseFloat(dLat), lng: parseFloat(dLng)};
+            geocoder.geocode({'location': latlng}, function(results, status) {
+              if (status === 'OK'){
+                startLoc[0] = results[0].formatted_address;
+              }
             });
              setRoutes();  //To start route and movement right away
         }
@@ -295,7 +306,6 @@
                         disp.setMap(map);
                         disp.setDirections(response);
 
-
                         //Markers
                         for (i=0;i<legs.length;i++) {
                             if (i == 0) {
@@ -334,16 +344,16 @@
         var stepnum=0;
 
 
-        var totalTime = document.getElementById("time")
-        var totalDistance = document.getElementById("distance")
+        var totalTime = document.getElementById("time").innerHTML;
+        var totalDistance = document.getElementById("distance").innerHTML;
+        //var totalTime = 11; //15
+        //var totalDistance = 3.1 //5
 
-        //var testTotalTime = 11; 
-        //var testTotalDistance = 3.1 
-
-        var step = (totalDistance/(0.00062137))/ (totalTime *6 ); // totalTime, totalDistance
+        var step = (totalDistance / (0.00062137))/ (totalTime * 6 ); // totalTime, totalDistance
+        //var tick = 2000;
         var tick = 10000;
 
-  
+
         var eol= [];
         //----------------------------------------------------------------------
         function updatePoly(i,d) {
@@ -364,12 +374,24 @@
         //----------------------------------------------------------------------------
 
         function animate(index,d) {
-            if (d>eol[index]) {
-
-                marker[index].setPosition(endLocation[index].latlng);
-                return;
-            }
+          // Driver arrived at the destination.
+          if (d>eol[index]) {
+              marker[index].setPosition(endLocation[index].latlng);
+              //window.alert(endLocation[index].latlng);
+              return;
+          }
             var p = polyline[index].GetPointAtDistance(d);
+            //window.alert(p);
+            // Sends server driver's location to change driver's current loc.
+            var socket = io();
+            var dID = document.getElementById("dID").innerHTML;
+            var dest = document.getElementById("end").innerHTML;
+            socket.emit('driverLoc', dID, p, dest);
+            //socket.on('trackRoute', function(data) {
+              //window.alert(data.distLeft, data.timeLeft);
+            //  document.getElementById("distLeft").innerHTML = data.distLeft;
+            //  document.getElementById("timeLeft").innerHTML = data.timeLeft;
+            //});
 
             map.panTo(p);
             marker[index].setPosition(p);
@@ -388,9 +410,6 @@
 
             timerHandle[index] = setTimeout("animate("+index+",50)",1000);  // Allow time for the initial map display
         }
-
-
-
 
     </script>
 <!--===============================================================================================-->

@@ -11,14 +11,38 @@ const conn = require('./dbCtrl'); // Connection to the database.
 const socketApi = require('./socketApi');
 const googleMap = require('./googleMapApi');
 
+/** Updates Working variable when driver accepts order. */
+module.exports.updateWorking = function (dID) {
+  // Updating notification value, only works when the on button is clicked since it calls this function.
+  var sql = 'UPDATE Driver SET Working = Working + 1 WHERE driverID = ?;';
+  var value = [dID];
+  conn.query(sql, value, function(err, result) {
+    if (err) { console.log('Updating Working variable failed.'); }
+    else { console.log('updateWorking: successful'); }
+  });
+}
+
+/** Updating notification value, only works when the on button is clicked since it calls this function. */
+module.exports.updateNotification = function (dID, onOff) {
+  var sql = 'UPDATE Driver SET Notification = ? WHERE driverID = ?;';
+  var value = [onOff, dID];
+  conn.query(sql, value, function(err, result) {
+    if (err) { console.log('Updating notification failed.'); }
+    else { console.log('updateNotifiaction: successful'); }
+  });
+}
+
 module.exports.trackRoute = function (lat, lng, destination) {
+  console.log("trackRoute");
   googleMap.mapClient.reverseGeocode({latlng: [lat, lng]
      }, function(err, res) {
         if (!err) {
+          console.log("trackRoute: reverse geocoded successfully.");
           var dAddr = res.json.results[0].formatted_address; // Converted address.
           // Sends distance and duration to the user.
           var route = function (distance, duration) {
-              socketApi.trackRouteInfo(distance, duration);
+            //console.log("trackRoute: route - ", distance, duration);
+            socketApi.trackRouteInfo(distance, duration);
           }
           // Caluclate distance/duration from driver to the destination.
           googleMap.calcRoute(dAddr, destination, route);
@@ -194,7 +218,7 @@ module.exports.addUser = function (req, res) {
       if (error == true) {
       console.log(dup);
         res.render('driverSignup', {errorM: emailMess + passMess + " **", errorEmail: dup });
-        
+
     }
     else {
       console.log("Validation is complete; Continue to adding user.");
@@ -207,7 +231,7 @@ module.exports.addUser = function (req, res) {
     if (error == true) {
       console.log(dup);
     		res.render('driverSignup', {errorM: emailMess + passMess + " **", errorEmail: dup });
-    		
+
     }
     else {
     	console.log("Validation is complete; Continue to adding user.");

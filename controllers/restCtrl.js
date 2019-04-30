@@ -65,15 +65,24 @@ module.exports.orderRequest = function (req, res) {
    */
   function routeInfo(distance, duration) {
       var price = (parseFloat(distance) * pricePerMile + parseFloat(duration) * pricePerMinute).toFixed(2);
-      var orderInfo = new OrderInfo(distance, duration, price);
-      // Send route information to the restaurant user.
-      socketApi.sendRouteInfo(rID, rName, rAddr, dest, orderInfo, null);
       // If order is not valid, send error message to the restaurant user.
       if (price < 6 || parseFloat(duration) > 30) {
         var err = "Order can't be made: \
                    we can't take order less than $6 or taking more than 30min.";
-        socketApi.sendErrMsg(err);
+        socketApi.sendMsg(err);
       } else {
+        // If first order, first 1 mile is free.
+        sql = 'SELECT * FROM Delivery WHERE rID = ?;';
+        conn.query(sql, rID, function (err, results) {
+          if (err) { console.log("routeInfo: db connection failed."); }
+          else {
+            price -= pricePerMile;
+            socketApi.sendMsg('You got free 1 mile for the first order!');
+          }
+        });
+        var orderInfo = new OrderInfo(distance, duration, price);
+        // Send route information to the restaurant user.
+        socketApi.sendRouteInfo(rID, rName, rAddr, dest, orderInfo, null);
         // If order is valid, find available drivers.
         findDrivers(orderInfo);
       }
@@ -93,7 +102,6 @@ module.exports.orderRequest = function (req, res) {
           Restaurant res, Driver dr WHERE del.rID = res.rID and dr.Working = 1 and dr.Notification = \‘ON\’)) \
           OR (Working = 0) and Notification = \‘ON\’ AND d.LocationID = lo.LocationID ;'; */
     conn.query(sql, function (err, drivers) {
-      console.log("drivers" + drivers);
        // For each available driver, covert lat/lng to address and find nearest driver.
        for (const driver of drivers) {
          findNearest(drivers, driver, orderInfo);
@@ -125,7 +133,7 @@ module.exports.orderRequest = function (req, res) {
               distances[driver.driverID] = [driver.Name, driver.Phone, distance, duration];
               // Find the nearest driver.
               if (drivers.length == Object.keys(distances).length) {
-                console.log(distances);
+                console.log("findNearest:", distances);
                 var minID, minDistance = 99999;
                 for (key in distances) {
                   if (minDistance > parseFloat(distances[key][2])) {
@@ -136,7 +144,6 @@ module.exports.orderRequest = function (req, res) {
                 // Save the nearest driver info.
                 var driverInfo = new DriverInfo(minID, distances[minID][0], distances[minID][1],
                   distances[minID][2], distances[minID][3]);
-                console.log(distances); // Print all available drivers info.
                 // Print the restaurant and the nearest driver info.
                 console.log(rID, rAddr, driverInfo.id, driverInfo.name,
                   driverInfo.phone, driverInfo.distToRest, driverInfo.timeToRest);
@@ -205,7 +212,7 @@ module.exports.saveOrder = function (rID, dID, dest, dist, duration, price) {
   function savePrice(orderID) {
     sql = 'INSERT INTO Price (orderID, totalDistance, totalTime, Price) \
            VALUE(?, ?, ?, ?);';
-    value = [orderID, dist, duration, price];
+    value = [orderID, parseFloat(dist), parseFloat(duration), parseFloat(price)];
     conn.query(sql, value, function (err, result) {
       if (err) { console.log('Inserting to Price table Failed..'); }
       else {

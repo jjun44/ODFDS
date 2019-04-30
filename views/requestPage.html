@@ -101,7 +101,7 @@
       // When button clicked, show route from start to end.
       var onChangeHandler = function() {
         // Initialize results in the last search.
-        document.getElementById("errMsg").innerHTML = '';
+        document.getElementById("msg").innerHTML = '';
         document.getElementById("routeInfo").style.visibility = 'hidden';
         document.getElementById("findingDriver").style.visibility = 'hidden';
         document.getElementById("driverInfo").style.visibility = 'hidden';
@@ -150,9 +150,9 @@
         document.getElementById("time").innerHTML = data.duration;
         document.getElementById("price").innerHTML = '$' + data.price;
       });
-      /** Receives error message if any from the server. */
-      socket.on('err', function(data) {
-        document.getElementById("errMsg").innerHTML = data.errMsg;
+      /** Receives a message from the server. */
+      socket.on('msg', function(data) {
+        document.getElementById("msg").innerHTML = data.msg;
         document.getElementById("findingDriver").style.visibility = 'hidden';
       });
       /** Receives order ID from the server.  */
@@ -178,7 +178,7 @@
 						Request a Driver
 					</span>
             <br><br><br>
-            <p id="errMsg"></p>
+            <p id="msg"></p>
             <div class="wrap-input100 validate-input" data-validate="Destination is required">
                 <span class="login50-form-title p-b-20">Enter the Destination</span>
                 <input class="input100" type="text" id="destination" name="destination" placeholder="Destination...">

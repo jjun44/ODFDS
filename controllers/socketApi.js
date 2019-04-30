@@ -25,6 +25,15 @@ io.on('connection', function(socket){
     console.log('(', type, ')', userId,  ': user connected (', socket.id, ')');
   });
 
+  /**
+   * Turn on/off driver's notification setting when user clicks.
+   * @param {string} dID driver ID
+   * @param {string} onOff either 'ON' or 'OFF'
+   */
+  socket.on('updateNotifi', function(dID, onOff) {
+    driverCtrl.updateNotification(dID, onOff);
+  });
+
   /** Deletes disconnected user info from the online user list. */
   socket.on('disconnect', function () {
     // Find user ID by socket ID and delete the user.
@@ -53,6 +62,8 @@ io.on('connection', function(socket){
     // Send driver info to the restaurant user.
     io.to(users[rID].SocketID).emit('driverInfo', { dID: dID, dName: dName,
                   dPhone: dPhone, distance: distToRest, arrivesIn: timeToRest });
+    // Update driver's Working variable.
+    driverCtrl.updateWorking(dID);
     // Save order information to the database.
     restCtrl.saveOrder(rID, dID, dest, dist, time, price);
   });
@@ -64,18 +75,19 @@ io.on('connection', function(socket){
   });
 });
 
+socketApi.trackRouteInfo = function(distance, duration) {
+  console.log("socket:trackRouteInfo:", distance, duration);
+  io.sockets.emit('trackRoute', { distLeft: distance, timeLeft: duration });
+}
+
 /**
  * Sends an error message to users.
  * @param {string} errMsg error message.
  */
-socketApi.sendErrMsg = function(errMsg) {
-  io.sockets.emit('err', { errMsg: errMsg });
+socketApi.sendMsg = function(msg) {
+  io.sockets.emit('msg', { msg: msg });
 }
 
-socketApi.trackRouteInfo = function(distance, duration) {
-  console.log(distance, duration);
-  io.sockets.emit('trackRoute', { distLeft: distance, timeLeft: duration });
-}
 /**
  * Sends route information to users.
  * @param {string} rID restaurnt ID

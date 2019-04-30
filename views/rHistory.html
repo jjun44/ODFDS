@@ -153,17 +153,17 @@
     else {
         rData = rData.split("],");
     }
-    
- 
+
+
     // Fixing the split data and storing into an array.
     var parseR = [];
     for (j = 0; j < rData.length; j++) {
 
         var tester = rData[j];
         if (tester.charAt(tester.length - 1) != "]") {
-            
+
             tester += "]";
-            
+
         }
         parseR.push(JSON.parse(tester));
     }
@@ -174,7 +174,7 @@
         var tabButton = document.createElement("button");
         tabButton.setAttribute("class", "tablinks");
         tabButton.innerHTML = "Order# " + (i + 1);
-        const od = 'od' + '' + (i + 1) + ''; 
+        const od = 'od' + '' + (i + 1) + '';
         if (i == 0) {
             tabButton.setAttribute("id", "defaultOpen");
         }
@@ -243,7 +243,7 @@
      }
 
 
- 
+
     function openCity(evt, cityName) {
         //alert(cityName);
         var i, tabcontent, tablinks;
@@ -364,10 +364,3 @@
 </div>
 </body>
 </html>
-
-
-
-
-
-
-

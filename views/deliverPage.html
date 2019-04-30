@@ -32,8 +32,12 @@
     <script>
     /** Sends driver ID info to the server. */
     var socket = io();
+    function turnOff() {
+      socket.emit('updateNotifi', document.getElementById('dID').innerHTML, 'OFF');
+    }
     function sendDriverInfo() {
       socket.emit('saveUserInfo', 'D', document.getElementById('dID').innerHTML);
+      socket.emit('updateNotifi', document.getElementById('dID').innerHTML, 'ON');
       getRequest();
     }
     /** Gets order requests from restaurants on real-time. */
@@ -106,7 +110,7 @@
             <p class="label-input100"><font size="5">Driver ID: <span id="dID">{{dID}}</font></p><br><br>
             <p class="label-input100"><font size="5">Start to receive delivery</font></p>
             <br>
-            <input type="radio" name="ready" id="off" checked>
+            <input type="radio" name="ready" id="off" checked onclick="turnOff()">
               <span><font size="4"><b>OFF</b></font></span>
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <input type="radio" name="ready" onclick="sendDriverInfo()">
