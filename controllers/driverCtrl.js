@@ -138,9 +138,11 @@ module.exports.addUser = function (req, res) {
 
 
   const name = req.body.name;
+  const driverLocation = req.body.sLocation;
   const license  = req.body.dl;
   const phone  = req.body.phone;
   const bank = req.body.bank;
+
   const working = 0;
   // Insert data into tables;
   var sql, value;
@@ -188,16 +190,39 @@ module.exports.addUser = function (req, res) {
     	else {
     		console.log("Email is good");
     	}
+
+      if (error == true) {
+      console.log(dup);
+        res.render('driverSignup', {errorM: emailMess + passMess + " **", errorEmail: dup });
+        
+    }
+    else {
+      console.log("Validation is complete; Continue to adding user.");
+      addUserInfo();
+    }
+
     })
 
+    /*
     if (error == true) {
+      console.log(dup);
     		res.render('driverSignup', {errorM: emailMess + passMess + " **", errorEmail: dup });
-    		console.log(dup);
+    		
     }
     else {
     	console.log("Validation is complete; Continue to adding user.");
     	addUserInfo();
     }
+    */
+  }
+
+  /**
+    This function will take the location that is inputted
+    and will convert to geocode and insert into the Location
+    table.
+  **/
+  function locationToGeoCode() {
+
   }
 
   /**
@@ -216,11 +241,11 @@ module.exports.addUser = function (req, res) {
    * @param {integer} userId auto-generated user ID
    */
   function addDriver(userId) {
-    sql = 'INSERT INTO Driver (uID, Name, License, Phone, \
-          BankAccount, Working, Notification) VALUE(?, ?, ?, ?, ?, ?, ?,);';
+    sql = 'INSERT INTO Driver (uID, Name, License, Phone,BankAccount, Working, Notification, LocationID) \
+           VALUE(?, ?, ?, ?, ?, ?, ?, ?);';
     value = [userId, name, license, phone, bank, working, 'OFF', 1001];
     conn.query(sql, value, function (err, result) {
-      if (err) { console.log('Inserting to Location Failed'); }
+      if (err) { console.log(err); }
       else {
         console.log('\nInserting user info into the db done successfully.\n');
         res.render('index');

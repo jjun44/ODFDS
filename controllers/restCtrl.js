@@ -93,6 +93,7 @@ module.exports.orderRequest = function (req, res) {
           Restaurant res, Driver dr WHERE del.rID = res.rID and dr.Working = 1 and dr.Notification = \‘ON\’)) \
           OR (Working = 0) and Notification = \‘ON\’ AND d.LocationID = lo.LocationID ;'; */
     conn.query(sql, function (err, drivers) {
+      console.log("drivers" + drivers);
        // For each available driver, covert lat/lng to address and find nearest driver.
        for (const driver of drivers) {
          findNearest(drivers, driver, orderInfo);
