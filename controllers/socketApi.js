@@ -63,9 +63,21 @@ io.on('connection', function(socket){
     io.to(users[rID].SocketID).emit('driverInfo', { dID: dID, dName: dName,
                   dPhone: dPhone, distance: distToRest, arrivesIn: timeToRest });
     // Update driver's Working variable.
-    driverCtrl.updateWorking(dID);
+    driverCtrl.updateWorking(dID, 'Working + 1');
     // Save order information to the database.
     restCtrl.saveOrder(rID, dID, dest, dist, time, price);
+  });
+
+  /**
+   * When order compeleted, update order status and
+   * driver's working status.
+   * @param {string} dID driver ID who worked on the order
+   * @param {string} orderID order ID compeleted
+   */
+  socket.on('orderCompleted', function(dID, orderID) {
+      console.log(dID, orderID, ": order completed");
+      driverCtrl.updateOrderStatus(orderID);
+      driverCtrl.updateWorking(dID, 'Working - 1');
   });
 
   socket.on('driverLoc', function(driverID, latlng, destination) {

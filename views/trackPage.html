@@ -131,7 +131,7 @@
                     </div>
             <br><br><br>
             <div id="result" class="jumbotron">
-                <h3 class="display-6" style="color:black;">Order ID: {{orderId}}</h3>
+                <h3 class="display-6" style="color:black;">Order ID: <span id="orderID">{{orderId}}</span></h3>
                 <p class="lead">Driver ID: <span id="dID">{{dID}}</span></p>
                 <p class="lead">Restaurant Address: <span id="rAddr">{{rAddr}}</span></p>
                 <p class="lead">Destination: <span id="end">{{dest}}</span></p>
@@ -219,9 +219,9 @@
             geocoder.geocode({'location': latlng}, function(results, status) {
               if (status === 'OK'){
                 startLoc[0] = results[0].formatted_address;
+                setRoutes();  //To start route and movement right away
               }
             });
-             setRoutes();  //To start route and movement right away
         }
 
 
@@ -350,8 +350,8 @@
         //var totalDistance = 3.1 //5
 
         var step = (totalDistance / (0.00062137))/ (totalTime * 6 ); // totalTime, totalDistance
-        //var tick = 2000;
-        var tick = 10000;
+        var tick = 50;
+        //var tick = 10000;
 
 
         var eol= [];
@@ -374,19 +374,27 @@
         //----------------------------------------------------------------------------
 
         function animate(index,d) {
+          var socket = io();
           // Driver arrived at the destination.
-          if (d>eol[index]) {
+          if (d > eol[index]) {
               marker[index].setPosition(endLocation[index].latlng);
-              //window.alert(endLocation[index].latlng);
+              // window.alert(endLocation[index].latlng);
+              window.alert("Order Completed!");
+              var dID = document.getElementById("dID").innerHTML;
+              var orderID = document.getElementById("orderID").innerHTML;
+              // Let server know order compeleted.
+              socket.emit('orderCompleted', dID, orderID);
+              socket.close();
               return;
           }
             var p = polyline[index].GetPointAtDistance(d);
             //window.alert(p);
             // Sends server driver's location to change driver's current loc.
-            var socket = io();
-            var dID = document.getElementById("dID").innerHTML;
-            var dest = document.getElementById("end").innerHTML;
-            socket.emit('driverLoc', dID, p, dest);
+            if (p != endLocation[index].latlng) {
+              var dID = document.getElementById("dID").innerHTML;
+              var dest = document.getElementById("end").innerHTML;
+              socket.emit('driverLoc', dID, p, dest);
+            }
             //socket.on('trackRoute', function(data) {
               //window.alert(data.distLeft, data.timeLeft);
             //  document.getElementById("distLeft").innerHTML = data.distLeft;

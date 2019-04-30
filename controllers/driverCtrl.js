@@ -11,18 +11,27 @@ const conn = require('./dbCtrl'); // Connection to the database.
 const socketApi = require('./socketApi');
 const googleMap = require('./googleMapApi');
 
-/** Updates Working variable when driver accepts order. */
-module.exports.updateWorking = function (dID) {
-  // Updating notification value, only works when the on button is clicked since it calls this function.
-  var sql = 'UPDATE Driver SET Working = Working + 1 WHERE driverID = ?;';
-  var value = [dID];
+/** Updates order status when order compeleted. */
+module.exports.updateOrderStatus = function (orderID) {
+  var sql = 'UPDATE Delivery SET Status = Complete WHERE orderID = ?;';
+  var value = [orderID];
+  conn.query(sql, value, function(err, result) {
+    if (err) { console.log('Updating order status failed.'); }
+    else { console.log('updateOrderStatus: successful'); }
+  });
+}
+
+/** Updates Working variable when driver accepts/compelets order. */
+module.exports.updateWorking = function (dID, change) {
+  var sql = 'UPDATE Driver SET Working = ? WHERE driverID = ?;';
+  var value = [change, dID];
   conn.query(sql, value, function(err, result) {
     if (err) { console.log('Updating Working variable failed.'); }
     else { console.log('updateWorking: successful'); }
   });
 }
 
-/** Updating notification value, only works when the on button is clicked since it calls this function. */
+/** Updates driver's Notification setting to ON or OFF. */
 module.exports.updateNotification = function (dID, onOff) {
   var sql = 'UPDATE Driver SET Notification = ? WHERE driverID = ?;';
   var value = [onOff, dID];
