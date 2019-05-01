@@ -175,10 +175,8 @@ module.exports.addUser = function (req, res) {
   // Get user information from the driver signup page.
   const email = req.body.email;
   const pwd = req.body.pwd;
-
   // Added a repeat password variable to check if the passwords match
   const rPwd = req.body.repeatpwd;
-
 
   const name = req.body.name;
   const driverLocation = req.body.sLocation;
@@ -206,7 +204,7 @@ module.exports.addUser = function (req, res) {
 
     // If any of the fields are null, return an error message.
     if ((email.length == 0 || !email.includes("@") || !email.includes(".com")) || (pwd.length == 0 || pwd != rPwd) || name.length ==0 ||
-    	license.length ==0 || (phone.length == 0 || phone.length != 10) || (bank.length == 0 || bank.length != 16))
+    	license.length ==0 || (phone.length == 0 || phone.length != 10) || (bank.length == 0))
     {
     	if (pwd.length < 4) {
     		passMess = "Password must be at least 4 characters";

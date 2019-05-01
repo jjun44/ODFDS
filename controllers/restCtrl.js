@@ -325,7 +325,7 @@ module.exports.addUser = function (req, res) {
     var error = false;
     // If any of the fields are null, return an error message.
     if ((email.length == 0 || !email.includes("@") || !email.includes(".com")) || (pwd.length == 0 || pwd != rPwd) || name.length ==0 ||
-      addr.length ==0 || (phone.length == 0 || phone.length != 10) || (creditCard.length == 0 || creditCard.length != 16))
+      addr.length ==0 || (phone.length == 0) || (creditCard.length == 0))
     {
       if (pwd.length < 4) {
         passMess = "Password must be at least 4 characters";
