@@ -76,8 +76,10 @@ module.exports.orderRequest = function (req, res) {
         conn.query(sql, rID, function (err, results) {
           if (err) { console.log("routeInfo: db connection failed."); }
           else {
-            price -= pricePerMile;
-            socketApi.sendMsg('You got free 1 mile for the first order!');
+            if (results.length == 0){
+              price -= pricePerMile;
+              socketApi.sendMsg('You got free 1 mile for the first order!');
+            }
           }
         });
         var orderInfo = new OrderInfo(distance, duration, price);
@@ -93,35 +95,30 @@ module.exports.orderRequest = function (req, res) {
    * @param {Object} orderInfo order information
    */
   function findDrivers(orderInfo) {
-    
-
-    // Find all available drivers.
+    // Find drivers with working value 1.
     sql = 'SELECT d.driverID, Name, Phone, Latitude, Longitude, rID \
-           FROM driver d, Location lo, Delivery del \
+           FROM Driver d, Location lo, Delivery del \
            WHERE Working = 1 and Notification = \'ON\' AND d.LocationID = lo.locationID and d.driverID = del.driverID AND del.rID = ?;';
     var rID = [rID];
-    
-           // Selects all of the drivers with working value at 0.
+    // Selects all of the drivers with working value 0.
     sql2 = 'SELECT driverID, Name, Phone, Latitude, Longitude FROM Driver d, \
            Location lo WHERE Working = 0 and Notification = \'ON\' AND \
            d.LocationID = lo.LocationID;';
-  
+
     conn.query(sql2, function (err, drivers) {
        // For each available driver, covert lat/lng to address and find nearest driver.
-
       if (err) {
         console.log(err);
       }
-      else if (drivers.length ==0) {
+      else if (drivers.length == 0) {
         console.log('No drivers with an order');
       }
       else  {
        for (const driver of drivers) {
         // Logs information on the driver.
-        console.log(driver);
+        console.log(drivers);
          findNearest(drivers, driver, orderInfo);
         }
-        
        }
     });
   }

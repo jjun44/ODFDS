@@ -138,6 +138,7 @@
     <script src = "/socket.io/socket.io.js"></script>
     <script>
     function getResult() {
+      document.getElementById("msg").innerHTML = '';
       var socket = io();
       /** Sends restaurnt ID to the server. */
       socket.emit('saveUserInfo', 'R', document.getElementById('rID').innerHTML);
@@ -191,10 +192,6 @@
                         Request
                     </button>
                 </div>
-		       <div class="wrap-login100-form-btn" >
-                        <div class="login100-form-bgbtn"></div>
-                        <button class="login100-form-btn" onclick="window.location.href='/rest'">Go Back</button>
-                    </div>
             </div>
 		<br><br><br>
             <div id="routeInfo" style="visibility:hidden; margin-top:20px; padding-top:30px; padding-bottom:30px;" class="jumbotron">
