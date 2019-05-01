@@ -74,16 +74,17 @@ io.on('connection', function(socket){
    * @param {string} dID driver ID who worked on the order
    * @param {string} orderID order ID compeleted
    */
-  socket.on('orderCompleted', function(dID, orderID) {
+  socket.on('orderCompleted', function(dID, orderID, endTime) {
       console.log(dID, orderID, ": order completed");
       driverCtrl.updateOrderStatus(orderID);
       driverCtrl.updateWorking(dID, 'Working - 1');
+      driverCtrl.updateEndTime(orderID, endTime);
   });
 
   socket.on('driverLoc', function(driverID, latlng, destination) {
     //console.log(driverID, latlng.lat, latlng.lng);
     driverCtrl.updateLocation(driverID, latlng.lat, latlng.lng);
-    driverCtrl.trackRoute(latlng.lat, latlng.lng, destination);
+    //driverCtrl.trackRoute(latlng.lat, latlng.lng, destination);
   });
 });
 

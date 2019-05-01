@@ -141,8 +141,8 @@
                 <hr class="my-4">
                 <p class="lead"></p>
                 <!--<p class="lead">Distance Left: <span id="distLeft">{{distLeft}}</span></p>
-                <p class="lead">Time Left: <span id="timeLeft">{{timeLeft}}</span></p>-->
-                <hr class="my-4">
+                <p class="lead">Time Left: <span id="timeLeft">{{timeLeft}}</span></p>
+                <hr class="my-4">-->
             </div></form></div>
             <br><br><br>
         </div>
@@ -382,8 +382,10 @@
               window.alert("Order Completed!");
               var dID = document.getElementById("dID").innerHTML;
               var orderID = document.getElementById("orderID").innerHTML;
+              var today = new Date();
+              var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
               // Let server know order compeleted.
-              socket.emit('orderCompleted', dID, orderID);
+              socket.emit('orderCompleted', dID, orderID, time);
               return;
           }
             var p = polyline[index].GetPointAtDistance(d);

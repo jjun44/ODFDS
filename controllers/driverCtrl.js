@@ -11,6 +11,16 @@ const conn = require('./dbCtrl'); // Connection to the database.
 const socketApi = require('./socketApi');
 const googleMap = require('./googleMapApi');
 
+/** Updates delivery end time when order is completed. */
+module.exports.updateEndTime = function (orderID, endTime) {
+  var sql = 'UPDATE Delivery SET endTime = ? WHERE orderID = ?;';
+  var value = [endTime, orderID];
+  conn.query(sql, value, function(err, result) {
+    if (err) { console.log('Updating order time failed.'); }
+    else { console.log('updateEndTime: successful'); }
+  });
+}
+
 /** Updates order status when order compeleted. */
 module.exports.updateOrderStatus = function (orderID) {
   var sql = 'UPDATE Delivery SET Status = "Complete" WHERE orderID = ?;';
@@ -46,7 +56,7 @@ module.exports.trackRoute = function (lat, lng, destination) {
   googleMap.mapClient.reverseGeocode({latlng: [lat, lng]
      }, function(err, res) {
         if (!err) {
-          console.log("trackRoute: reverse geocoded successfully.");
+          //console.log("trackRoute: reverse geocoded successfully.");
           var dAddr = res.json.results[0].formatted_address; // Converted address.
           // Sends distance and duration to the user.
           var route = function (distance, duration) {
