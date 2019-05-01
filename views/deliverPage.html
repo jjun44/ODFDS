@@ -32,6 +32,9 @@
     <script>
     /** Sends driver ID info to the server. */
     var socket = io();
+    socket.on('orderID', function (data) {
+      window.alert('Order Accepted!\nOrder ID:' + data.orderID);
+    });
     function turnOff() {
       socket.emit('updateNotifi', document.getElementById('dID').innerHTML, 'OFF');
     }
@@ -89,7 +92,7 @@
                     document.getElementById(time).innerHTML, document.getElementById(price).innerHTML,
                     document.getElementById(dName).innerHTML, document.getElementById(dPhone).innerHTML,
                     document.getElementById(distToRest).innerHTML, document.getElementById(timeToRest).innerHTML);
-            window.alert('Order Accepted!');
+            //window.alert('Order Accepted!');
           }
           submit('rID' + i, 'dest' + i, 'dist' + i, 'time' + i, 'price' + i,
                  'dName' + i, 'dPhone' + i, 'distToRest' + i, 'timeToRest' + i);

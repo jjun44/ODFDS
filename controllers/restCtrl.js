@@ -175,7 +175,7 @@ module.exports.saveOrder = function (rID, dID, dest, dist, duration, price) {
     if (err) { console.log('Inserting to Delivery Failed..'); }
     else {
       console.log('Inserting delivery info into the db done successfully.');
-      socketApi.sendOrderID(result.insertId); // Send order ID to the restaurant user.
+      socketApi.sendOrderID(result.insertId, dID); // Send order ID to both users.
       savePrice(result.insertId); // Save price infomration.
       changeDriverLoc(rID, dID);
     }

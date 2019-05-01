@@ -131,8 +131,9 @@ socketApi.sendRouteInfo = function(rID, rName, rAddr, dest, order, driver) {
  * Sends order ID information to users.
  * @param {string} orderID orderID created from the database.
  */
-socketApi.sendOrderID = function(orderID) {
+socketApi.sendOrderID = function(orderID, dID) {
   io.sockets.emit('orderID', { orderID: orderID });
+  io.to(users[dID].SocketID).emit('orderID', { orderID: orderID });
 }
 
 module.exports = socketApi;
