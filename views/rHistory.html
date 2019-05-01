@@ -152,6 +152,7 @@
     }
     else {
         rData = rData.split("],");
+
     }
 
 
@@ -213,6 +214,10 @@
         dest.setAttribute("class", "lead");
         dest.appendChild(document.createTextNode("Destination: " + parseR[i][0].Destination));
 
+        var sta = document.createElement("P");
+        sta.setAttribute("class", "lead");
+        sta.appendChild(document.createTextNode("Status: " + parseR[i][0].stat));
+
         //Changed total time
 
         var time = document.createElement("P");
@@ -223,6 +228,8 @@
         price.setAttribute("class", "lead");
         price.appendChild(document.createTextNode("Total Price: $" + parseR[i][0].price));
 
+ 
+
         var hr2 = document.createElement("HR");
         hr2.setAttribute("class", "my-4");
 
@@ -232,6 +239,7 @@
         info.appendChild(rName);
         info.appendChild(reuse);
         info.appendChild(dest);
+        info.appendChild(sta);
         info.appendChild(time);
         info.appendChild(price);
         info.appendChild(hr2);

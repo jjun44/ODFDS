@@ -271,7 +271,7 @@ module.exports.getOrderHistory = function (req, res) {
       else {
         for (i = 0; i < result.length; i++) {
           console.log("orderID: ", result[i]);
-          const sql2 = 'select d.orderId, dr.Name AS dName, r.Name, dr.Phone, Destination, totalTime, price \
+          const sql2 = 'select d.orderId, dr.Name AS dName, r.Name, dr.Phone, Destination, totalTime, price, d.Status AS stat\
                         from Restaurant r, Delivery d, Price p, Driver dr \
                         where d.orderId = ? and d.rId = r.rId and d.orderId = p.orderId and d.driverID = dr.driverID'
           const ids = [result[i].orderID];
@@ -281,8 +281,9 @@ module.exports.getOrderHistory = function (req, res) {
               res.render('rHistory');
             }
             else {
+              console.log(result2);
               connects.push(JSON.stringify(result2));
-              if (connects.length != result2.length) {
+              if (connects.length != result.length) {
                 console.log("not Done");
               }
               else {

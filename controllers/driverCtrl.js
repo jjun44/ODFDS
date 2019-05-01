@@ -139,18 +139,18 @@ module.exports.getOrderHistory = function (req, res) {
           console.log('orderID: ', result[i]);
 
           // Changed sql2
-          const sql2 = 'select d.orderId, Name, Address, Destination, totalTime, totalDistance, \
-              price from Restaurant r, Delivery d, \
-              Price p where d.orderId = ? and d.rId = r.rId \
-             and d.orderId = p.orderId'
+          const sql2 = 'select d.orderId, Name, Address, Destination, totalTime, totalDistance, d.Status AS stat, price \
+              from Restaurant r, Delivery d, \
+              Price p where d.orderId = ? and d.rId = r.rId and d.orderId = p.orderId'
           const ids = [result[i].orderID];
           conn.query(sql2, ids, function (err, result2) {
             if (err || result2.length == 0) {
-              console.log("couldnt get info");
+              console.log(err);
                 res.render('dHistory');
               }
             else {
                 connects.push(JSON.stringify(result2));
+                console.log(result2);
                 if (connects.length != result.length) {
                   console.log("not done");
                 }
