@@ -384,7 +384,6 @@
               var orderID = document.getElementById("orderID").innerHTML;
               // Let server know order compeleted.
               socket.emit('orderCompleted', dID, orderID);
-              socket.close();
               return;
           }
             var p = polyline[index].GetPointAtDistance(d);

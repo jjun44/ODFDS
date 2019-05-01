@@ -81,7 +81,7 @@ io.on('connection', function(socket){
   });
 
   socket.on('driverLoc', function(driverID, latlng, destination) {
-    console.log(driverID, latlng.lat, latlng.lng);
+    //console.log(driverID, latlng.lat, latlng.lng);
     driverCtrl.updateLocation(driverID, latlng.lat, latlng.lng);
     driverCtrl.trackRoute(latlng.lat, latlng.lng, destination);
   });
@@ -97,7 +97,9 @@ socketApi.trackRouteInfo = function(distance, duration) {
  * @param {string} errMsg error message.
  */
 socketApi.sendMsg = function(msg) {
+  //console.log("Sending msg to user");
   io.sockets.emit('msg', { msg: msg });
+  //console.log("Sending msg done");
 }
 
 /**
@@ -110,6 +112,7 @@ socketApi.sendMsg = function(msg) {
  * @param {Object} driver nearest driver information
  */
 socketApi.sendRouteInfo = function(rID, rName, rAddr, dest, order, driver) {
+  console.log("sendRouteInfo...");
   /* Send order information to restaurant users.  */
   io.sockets.emit('orderInfoToR', { rName: rName, rAddr: rAddr, dest: dest,
                                     distance: order.dist, duration: order.time, price: order.price });
@@ -120,6 +123,7 @@ socketApi.sendRouteInfo = function(rID, rName, rAddr, dest, order, driver) {
                                       dID: driver.id, dName: driver.name, dPhone: driver.phone,
                                       distToRest: driver.distToRest, timeToRest: driver.timeToRest });
   }
+  console.log("sendRouteInfo done");
 }
 
 /**

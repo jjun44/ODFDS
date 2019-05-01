@@ -13,7 +13,7 @@ const googleMap = require('./googleMapApi');
 
 /** Updates order status when order compeleted. */
 module.exports.updateOrderStatus = function (orderID) {
-  var sql = 'UPDATE Delivery SET Status = Complete WHERE orderID = ?;';
+  var sql = 'UPDATE Delivery SET Status = "Complete" WHERE orderID = ?;';
   var value = [orderID];
   conn.query(sql, value, function(err, result) {
     if (err) { console.log('Updating order status failed.'); }
@@ -23,8 +23,8 @@ module.exports.updateOrderStatus = function (orderID) {
 
 /** Updates Working variable when driver accepts/compelets order. */
 module.exports.updateWorking = function (dID, change) {
-  var sql = 'UPDATE Driver SET Working = ? WHERE driverID = ?;';
-  var value = [change, dID];
+  var sql = 'UPDATE Driver SET Working = ' + change + ' WHERE driverID = ?;';
+  var value = [dID];
   conn.query(sql, value, function(err, result) {
     if (err) { console.log('Updating Working variable failed.'); }
     else { console.log('updateWorking: successful'); }
@@ -87,7 +87,7 @@ module.exports.updateLocation = function(dID, lat, lng) {
 module.exports.getDeliveryInfo = function (req, res) {
   const orderId = req.body.orderId;
   const sql = 'select d.orderID, Name, Address, Destination, totalDistance, \
-               totalTime, Price from Delivery d, Restaurant r, Price p \
+               totalTime, Price, d.Status from Delivery d, Restaurant r, Price p \
                where d.orderID = ? and d.orderID = p.orderID and d.rID = r.rID;';
   var value = [orderId]
   conn.query(sql, value, function (err, result) {
@@ -98,7 +98,7 @@ module.exports.getDeliveryInfo = function (req, res) {
     }
     else {
     console.log(result, '\n', result.orderId);
-    res.render('deliverInfo', {'orderId': result[0].orderID,
+    res.render('deliverInfo', {'orderId': result[0].orderID, 'status': result[0].Status,
                                'rName': result[0].Name, 'rAddr': result[0].Address,
                                'dest': result[0].Destination, 'time': result[0].totalTime,
                                'dist': result[0].totalDistance,
