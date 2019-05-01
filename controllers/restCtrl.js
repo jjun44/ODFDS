@@ -93,18 +93,35 @@ module.exports.orderRequest = function (req, res) {
    * @param {Object} orderInfo order information
    */
   function findDrivers(orderInfo) {
+    
+
     // Find all available drivers.
-    sql = 'SELECT driverID, Name, Phone, Latitude, Longitude FROM Driver d, \
+    sql = 'SELECT d.driverID, Name, Phone, Latitude, Longitude, rID \
+           FROM driver d, Location lo, Delivery del \
+           WHERE Working = 1 and Notification = \'ON\' AND d.LocationID = lo.locationID and d.driverID = del.driverID AND del.rID = ?;';
+    var rID = [rID];
+    
+           // Selects all of the drivers with working value at 0.
+    sql2 = 'SELECT driverID, Name, Phone, Latitude, Longitude FROM Driver d, \
            Location lo WHERE Working = 0 and Notification = \'ON\' AND \
            d.LocationID = lo.LocationID;';
-    /*sql = 'SELECT driverID, Name, Phone, Latitude, Longitude FROM Driver d, \
-          Location lo WHERE (d.driverID IN (SELECT driverID from Delivery del, \
-          Restaurant res, Driver dr WHERE del.rID = res.rID and dr.Working = 1 and dr.Notification = \‘ON\’)) \
-          OR (Working = 0) and Notification = \‘ON\’ AND d.LocationID = lo.LocationID ;'; */
-    conn.query(sql, function (err, drivers) {
+  
+    conn.query(sql2, function (err, drivers) {
        // For each available driver, covert lat/lng to address and find nearest driver.
+
+      if (err) {
+        console.log(err);
+      }
+      else if (drivers.length ==0) {
+        console.log('No drivers with an order');
+      }
+      else  {
        for (const driver of drivers) {
+        // Logs information on the driver.
+        console.log(driver);
          findNearest(drivers, driver, orderInfo);
+        }
+        
        }
     });
   }
