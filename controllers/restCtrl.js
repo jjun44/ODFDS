@@ -95,31 +95,49 @@ module.exports.orderRequest = function (req, res) {
    * @param {Object} orderInfo order information
    */
   function findDrivers(orderInfo) {
-    // Find drivers with working value 1.
-    sql = 'SELECT d.driverID, Name, Phone, Latitude, Longitude, rID \
-           FROM Driver d, Location lo, Delivery del \
-           WHERE Working = 1 and Notification = \'ON\' AND d.LocationID = lo.locationID and d.driverID = del.driverID AND del.rID = ?;';
-    var rID = [rID];
-    // Selects all of the drivers with working value 0.
-    sql2 = 'SELECT driverID, Name, Phone, Latitude, Longitude FROM Driver d, \
-           Location lo WHERE Working = 0 and Notification = \'ON\' AND \
-           d.LocationID = lo.LocationID;';
+    var drivers1 = [];
+    // Find drivers who's working on their 1st delievery from the same restaurnat.
+    var sql1 = "select d.driverID, d.Name, d.Phone, Latitude, Longitude, Price \
+                from Driver d, Restaurant r, Delivery del, Location l, Price p \
+                where Working = 1 and Notification = 'ON' AND del.driverID = d.driverID \
+                AND del.rID = r.rID AND l.LocationID = d.LocationID AND r.Address = ? \
+                AND del.Status = 'Incomplete' AND p.orderID = del.orderID;";
 
-    conn.query(sql2, function (err, drivers) {
+    conn.query(sql1, rAddr, function (err, wDrivers) {
+      if (err) { console.log("findDrivers: sql1 failed."); }
+      // If result is not 0, go over each working driver to
+      // see if they matches with the price restriction.
+      else {
+        if (wDrivers.length > 0) {
+          for (const driver of wDrivers) {
+            // current order price < previous order price
+            console.log(wDrivers);
+            if (driver.Price > orderInfo.price) {
+              drivers1.push(driver);
+            }
+          }
+        }
+      }
+    });
+    console.log(drivers1);
+    // Find all available drivers who are not working.
+    var sql2 = 'SELECT driverID, Name, Phone, Latitude, Longitude FROM Driver d, \
+                Location lo WHERE Working = 0 and Notification = \'ON\' AND \
+                d.LocationID = lo.LocationID;';
+
+    conn.query(sql2, function (err, drivers2) {
        // For each available driver, covert lat/lng to address and find nearest driver.
       if (err) {
-        console.log(err);
+        console.log("findDrivers: sql2 failed.");
+
+      } else {
+        drivers = drivers1.concat(drivers2);
+        //console.log(drivers);
+         for (const driver of drivers) {
+          // Logs information on the driver.
+           findNearest(drivers, driver, orderInfo);
+         }
       }
-      else if (drivers.length == 0) {
-        console.log('No drivers with an order');
-      }
-      else  {
-       for (const driver of drivers) {
-        // Logs information on the driver.
-        console.log(drivers);
-         findNearest(drivers, driver, orderInfo);
-        }
-       }
     });
   }
   /**
