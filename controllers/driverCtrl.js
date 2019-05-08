@@ -190,81 +190,137 @@ module.exports.addUser = function (req, res) {
   var error = false;
   var mEmail = false;
 
-  validateSignUp();
-  /*
-    This function will be responsible for validating each input field of the page.
-  */
-  function validateSignUp() {
-    console.log("Validating..... \n");
-
-    var emailMess = "";
-    var passMess = "";
-    var dup = "";
+  validateEmail();
 
 
-    // If any of the fields are null, return an error message.
-    if ((email.length == 0 || !email.includes("@") || !email.includes(".com")) || (pwd.length == 0 || pwd != rPwd) || name.length ==0 ||
-    	license.length ==0 || (phone.length == 0 || phone.length != 10) || (bank.length == 0))
-    {
-    	if (pwd.length < 4) {
-    		passMess = "Password must be at least 4 characters";
+    /**
+      This function will be responsible for checking of the email; needed to be separate from all the checks
+      since it requires to check if the email exists in the DB.
 
-    	}
-    	else if (pwd != rPwd) {passMess ="Passwords don't match";}
-    	error = true;
-    	console.log("Missing Sign up information");
-    	emailMess = "** Invalid information.  "
-    }
+      Overall functionality:
+        1. Searches the DB if it exists, if so then re render the page with an error.
+        2. Checks if the email is valid; if so then proceed to checking the other fields.
 
+      Note: Done.
+
+    **/
+    function validateEmail() {
+
+
+        // Email Checking; check for email in the db
     // Query for checking if the email already exists
     const eQuery = 'Select Email from User \
-    				where Email = ?'
+            where Email = ?'
 
     const val = [email]
     conn.query(eQuery, val, function(err, result) {
-    	if (err) {console.log("Error finding email");}
-    	else if (result.length != 0) {
-    		dup = "* Already Exists ";
-    		console.log("Email Already Exists \n");
-    		error = true;
-    	}
-    	else {
-    		console.log("Email is good");
-    	}
+      if (err) {console.log("Error finding email");}
+      else if (result.length != 0) {
+        errorMessage = "Error: Email Exists";
+        console.log("Email Already Exists \n");
+        res.render('driverSignup', {errorM: errorMessage});
+      }
+      else {    // Email is not present in the db; therefore check if passes the requirements.
 
-      if (error == true) {
-      console.log(dup);
-        res.render('driverSignup', {errorM: emailMess + passMess + " **", errorEmail: dup });
+      if (email.length == 0) {
+      console.log('Email is non inputed');
+      errorMessage = "Please input email";
+      res.render('driverSignup', {errorM: errorMessage});
+    }
+    else if (!email.includes("@") || !email.includes(".com")) {
+      console.log("not a valid email");
+      errorMessage = "Enter a VALID email.";
+      res.render('driverSignup', {errorM: errorMessage });
+    }
+    else {
+     console.log("Email is Verified; proceed to the other fields");
+     validateEntries();
+    }
+  }})
+}
+
+    /**
+      This method will be responsible for validatig each field in the signup page.
+
+    **/ 
+    function validateEntries() {
+    // Password Checking
+    if (pwd.length < 4) {
+      console.log("Invalid Pasword \n");
+      if (pwd.length == 0) {
+        errorMessage = "Please input password";
+        res.render('driverSignup', {errorM: errorMessage });
+        return;
+      }
+      else {
+        errorMessage = "Error: Password must be at least 4 characters"; 
+        res.render('driverSignup', {errorM: errorMessage });
+        return;
+      }
 
     }
     else {
-      console.log("Validation is complete; Continue to adding user.");
-      addUserInfo();
+      if (rPwd.length == 0) {
+        console.log("Password is not verified. \n");
+        errorMessage = "Error: Re type your password for verification.";
+        res.render('driverSignup', {errorM: errorMessage });
+        return;
+      }
+      else if (pwd != rPwd) {
+        errorMessage = "Passwords do not match.";
+        res.render('driverSignup', {errorM: errorMessage});
+        return;
+      }
     }
 
-    })
 
-    /*
-    if (error == true) {
-      console.log(dup);
-    		res.render('driverSignup', {errorM: emailMess + passMess + " **", errorEmail: dup });
+    // Checkpoint in console.
+    console.log("Password Verified");
+  
+    if (name.length == 0) {
+      console.log("Name not inputted \n");
+      errorMessage = "Enter a name.";
+      res.render('driverSignup', {errorM: errorMessage});
+      return;
+    }
 
+    // Checkpoint.
+    console.log("Name is Verified \n");
+
+
+    /*          ################################################ License ######################################## */
+
+    if (license.length == 0) {
+      console.log("Invalid license ID. \n");
+      errorMessage = "Enter a valid Driver's License: (1234567890)";
+      res.render('driverSignup', {errorM: errorMessage });
+      return;
+    }
+
+
+
+    if (phone.length == 0 || phone.length != 10) {
+      console.log("Invalid phone number. \n");
+      errorMessage = "Enter a valid Phone number: (1234567890)";
+      res.render('driverSignup', {errorM: errorMessage });
+      return;
     }
     else {
-    	console.log("Validation is complete; Continue to adding user.");
-    	addUserInfo();
+      console.log("Phone is good.");
     }
-    */
-  }
 
-  /**
-    This function will take the location that is inputted
-    and will convert to geocode and insert into the Location
-    table.
-  **/
-  function locationToGeoCode() {
+    if (bank.length == 0 || bank.length != 16) {
+      console.log("no bank input \n");
+      errorMessage = "bank account must be 16 digits long.";
+      res.render('driverSignup', {errorM: errorMessage });
+      return;
+    }
+    else {
+      console.log("Bank is Validated");
+    }
 
-  }
+     addUserInfo();
+    }
 
   /**
    * Insert user infomration into User table.
@@ -277,6 +333,7 @@ module.exports.addUser = function (req, res) {
        else { addDriver(result.insertId); }
      })
    }
+
   /**
    * Inserts driver information into Driver table.
    * @param {integer} userId auto-generated user ID

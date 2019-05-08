@@ -330,6 +330,8 @@ module.exports.getOrderHistory = function (req, res) {
   }
 }
 
+/*      #################################################### START WORKING HERE #################################   */
+
 /**
  * Gets restaurnt user information from the user,
  * validates the user info, and saves information
@@ -347,51 +349,146 @@ module.exports.addUser = function (req, res) {
   const creditCard = req.body.creditCard;
   // Insert data into tables;
   var sql, value;
-  validateSignUp();
-  /*
-    This function will be responsible for validating each input field of the page.
-  */
-  function validateSignUp() {
-    console.log("Validating..... \n");
-    var emailMess = "";
-    var passMess = "";
-    var dup = "";
-    var error = false;
-    // If any of the fields are null, return an error message.
-    if ((email.length == 0 || !email.includes("@") || !email.includes(".com")) || (pwd.length == 0 || pwd != rPwd) || name.length ==0 ||
-      addr.length ==0 || (phone.length == 0) || (creditCard.length == 0))
-    {
-      if (pwd.length < 4) {
-        passMess = "Password must be at least 4 characters";
-      }
-      else if (pwd != rPwd) {passMess = "Passwords don't match.";}
-      error = true;
-      console.log("Missing Sign up information");
-      emailMess = "** Invalid information.  "
-    }
+  validateEmail();
+
+
+
+
+    /**
+      This function will be responsible for checking of the email; needed to be separate from all the checks
+      since it requires to check if the email exists in the DB.
+
+      Overall functionality:
+        1. Searches the DB if it exists, if so then re render the page with an error.
+        2. Checks if the email is valid; if so then proceed to checking the other fields.
+
+      Note: Done.
+
+    **/
+    function validateEmail() {
+
+
+        // Email Checking; check for email in the db
+    // Query for checking if the email already exists
     const eQuery = 'Select Email from User \
             where Email = ?'
+
     const val = [email]
     conn.query(eQuery, val, function(err, result) {
       if (err) {console.log("Error finding email");}
-      if (result.length != 0) {
-        dup = "* Already Exists ";
+      else if (result.length != 0) {
+        errorMessage = "Error: Email Exists";
         console.log("Email Already Exists \n");
-        error = true;
+        res.render('restaurantSignup', {errorM: errorMessage});
+        return;
       }
-      else {
-        console.log("Email is good");
-      }
-    })
-    if (error == true) {
-        console.log("Errors in the page; Reloading");
-        res.render('restaurantSignup', {errorM: emailMess + passMess + " **", errorEmail: dup });
+      else {    // Email is not present in the db; therefore check if passes the requirements.
+
+      if (email.length == 0) {
+      console.log('Email is non inputed');
+      errorMessage = "Please input email";
+      res.render('restaurantSignup', {errorM: errorMessage});
+      return;
+    }
+    else if (!email.includes("@") || !email.includes(".com")) {
+      console.log("not a valid email");
+      errorMessage = "Enter a VALID email.";
+      res.render('restaurantSignup', {errorM: errorMessage });
+      return;
     }
     else {
-      console.log("Validation is complete; Continue to adding user.");
-      addUserInfo();
+     console.log("Email is Verified; proceed to the other fields");
+     validateEntries();
     }
-  }
+  }})
+}
+
+
+    /**
+      This method will be responsible for validating the entries 
+
+    **/ 
+    function validateEntries() {
+    // Password Checking
+    if (pwd.length < 4) {
+      console.log("Invalid Pasword \n");
+      if (pwd.length == 0) {
+        errorMessage = "Please input password";
+        res.render('restaurantSignup', {errorM: errorMessage });
+        return;
+      }
+      else {
+        errorMessage = "Error: Password must be at least 4 characters"; 
+        res.render('restaurantSignup', {errorM: errorMessage });
+        return;
+      }
+
+    }
+    else {
+      if (rPwd.length == 0) {
+        console.log("Password is not verified. \n");
+        errorMessage = "Error: Re type your password for verification.";
+        res.render('restaurantSignup', {errorM: errorMessage });
+        return;
+      }
+      else if (pwd != rPwd) {
+        console.log("Passwords do NOT match. \n");
+        errorMessage = "Passwords do not match.";
+        res.render('restaurantSignup', {errorM: errorMessage});
+        return;
+      }
+    }
+
+
+    // Checkpoint in console.
+    console.log("Password Verified");
+  
+    if (name.length == 0) {
+      console.log("Name not inputted \n");
+      errorMessage = "Enter a name.";
+      res.render('restaurantSignup', {errorM: errorMessage});
+      return;
+    }
+
+    // Checkpoint.
+    console.log("Name is Verified \n");
+
+
+    /*          ################################################ License ######################################## */
+
+    if (addr.length == 0) {
+      console.log("Invalid license ID. \n");
+      errorMessage = "Enter a valid Address (Ex: 1 Washington Square)";
+      res.render('restaurantSignup', {errorM: errorMessage });
+      return;
+    }
+
+
+
+    if (phone.length == 0 || phone.length != 10) {
+      console.log("Invalid phone number. \n");
+      errorMessage = "Enter a valid Phone number: (1234567890)";
+      res.render('restaurantSignup', {errorM: errorMessage });
+      return;
+    }
+    else {
+      console.log("Phone is good.");
+    }
+
+    if (creditCard.length == 0 || creditCard.length != 16) {
+      console.log("no bank input \n");
+      errorMessage = "Credit Card must be 16 digits long.";
+      res.render('restaurantSignup', {errorM: errorMessage });
+      return;
+    }
+    else {
+      console.log("Bank is Validated");
+    }
+
+     addUserInfo();
+    }
+
+
   /**
    * Insert user information into User table.
    */
