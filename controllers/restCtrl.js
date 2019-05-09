@@ -84,7 +84,7 @@ module.exports.orderRequest = function (req, res) {
         });
         var orderInfo = new OrderInfo(distance, duration, price);
         // Send route information to the restaurant user.
-        socketApi.sendRouteInfo(rID, rName, rAddr, dest, orderInfo, null);
+        socketApi.sendRouteInfo(rID, rName, rAddr, dest, orderInfo, null, res);
         // If order is valid, find available drivers.
         findDrivers(orderInfo);
       }
@@ -180,7 +180,7 @@ module.exports.orderRequest = function (req, res) {
                 console.log(rID, rAddr, driverInfo.id, driverInfo.name,
                   driverInfo.phone, driverInfo.distToRest, driverInfo.timeToRest);
                 // Send route information to the corresponding driver.
-                socketApi.sendRouteInfo(rID, rName, rAddr, dest, orderInfo, driverInfo);
+                socketApi.sendRouteInfo(rID, rName, rAddr, dest, orderInfo, driverInfo, res);
               }
             }
             // Caluclate distance/duration from driver to restaurnt.
@@ -405,9 +405,9 @@ module.exports.addUser = function (req, res) {
 
 
     /**
-      This method will be responsible for validating the entries 
+      This method will be responsible for validating the entries
 
-    **/ 
+    **/
     function validateEntries() {
     // Password Checking
     if (pwd.length < 4) {
@@ -418,7 +418,7 @@ module.exports.addUser = function (req, res) {
         return;
       }
       else {
-        errorMessage = "Error: Password must be at least 4 characters"; 
+        errorMessage = "Error: Password must be at least 4 characters";
         res.render('restaurantSignup', {errorM: errorMessage });
         return;
       }
@@ -442,7 +442,7 @@ module.exports.addUser = function (req, res) {
 
     // Checkpoint in console.
     console.log("Password Verified");
-  
+
     if (name.length == 0) {
       console.log("Name not inputted \n");
       errorMessage = "Enter a name.";

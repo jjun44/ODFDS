@@ -111,8 +111,9 @@ socketApi.sendMsg = function(msg) {
  * @param {string} dest delivery destination
  * @param {Object} order order information including distance, time, and price
  * @param {Object} driver nearest driver information
+ * @param {Object} res HTTP response
  */
-socketApi.sendRouteInfo = function(rID, rName, rAddr, dest, order, driver) {
+socketApi.sendRouteInfo = function(rID, rName, rAddr, dest, order, driver, res) {
   console.log("sendRouteInfo...");
   /* Send order information to restaurant users.  */
   io.sockets.emit('orderInfoToR', { rName: rName, rAddr: rAddr, dest: dest,
@@ -124,7 +125,13 @@ socketApi.sendRouteInfo = function(rID, rName, rAddr, dest, order, driver) {
                                       dID: driver.id, dName: driver.name, dPhone: driver.phone,
                                       distToRest: driver.distToRest, timeToRest: driver.timeToRest });
   }
-  console.log("sendRouteInfo done");
+  //setTimeout(this.sendRouteInfo, 20 * 60 * 1000)
+  setTimeout(function() {
+    setTimeout(function() {
+      res.redirect('/rest/request');
+    }, 5);
+    this.sendRouteInfo;
+  }, 10 * 60 * 1000);
 }
 
 /**
