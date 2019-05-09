@@ -49,7 +49,7 @@ module.exports.login = function (req, res) {
      }
      // User not found.
      if (result.length <= 0) {
-        return res.render('index', {errorMessage:'Invalid Login, Try again.'});
+        return res.render('index', {errorLogin:'Invalid Login, Try again.'});
       }
      // User found.
       console.log('Login validation success');
