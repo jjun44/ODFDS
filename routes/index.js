@@ -32,7 +32,9 @@ router.get('/logout', mainCtrl.logout);
 /* Get restaurant's dashboard */
 router.get('/rest', function(req, res, next) {
   if (req.session.loggedIn && req.session.type == 'Restaurant') {
-    res.render('restaurantMain');
+    res.render('restaurantMain', { rID: req.session.rID,
+                                   rName: req.session.rName,
+                                   rAddr: req.session.rAddr });
   } else {
     res.render('error', {msg:'Please login to view this page!'});
   }
@@ -41,7 +43,7 @@ router.get('/rest', function(req, res, next) {
 /* Get driver's dashboard */
 router.get('/driver', function(req, res, next) {
   if (req.session.loggedIn && req.session.type == 'Driver') {
-    res.render('driverMain');
+    res.render('driverMain', {dID: req.session.dID, dName: req.session.dName});
   } else {
     res.render('error', {msg:'Please login to view this page!'});
   }

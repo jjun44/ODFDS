@@ -60,12 +60,13 @@ module.exports.login = function (req, res) {
       // Compare type to add more session variables and rend a corresponding dashboard.
       if (result[0].Type == 'Driver'){ // Driver user
         // Get driverID and copy it to session variable.
-        sql = 'select driverID from Driver where uID = ?;'
+        sql = 'select * from Driver where uID = ?;'
         conn.query(sql, req.session.uID, function (err, result) {
           if (err) { console.log('Database connecton failed: Driver'); }
           req.session.dID = result[0].driverID;
+          req.session.dName = result[0].Name;
           console.log('uID:',req.session.uID, req.session.type, req.session.dID, 'sessionID:',req.sessionID);
-          return res.render('driverMain');
+          return res.redirect('/driver');
         })
       }
       else { // Restaurant user
@@ -78,7 +79,7 @@ module.exports.login = function (req, res) {
           req.session.rAddr = result[0].Address;
           console.log('uID:',req.session.uID, req.session.type, req.session.rID,
                       req.session.rName, req.session.rAddr, 'sessionID:',req.sessionID);
-          return res.render('restaurantMain');
+          return res.redirect('/rest');
         })
       }
   });

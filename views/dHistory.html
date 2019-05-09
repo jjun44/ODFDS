@@ -146,17 +146,17 @@
         rData = rData.split("],");
         //alert(rData);
     }
-    
- 
+
+
     // Fixing the split data and storing into an array.
     var parseR = [];
     for (j = 0; j < rData.length; j++) {
         var tester = rData[j];
         if (tester.charAt(tester.length - 1) != "]") {
-            
+
             tester += "]";
 
-            
+
         }
         parseR.push(JSON.parse(tester));
     }
@@ -165,7 +165,7 @@
         var tabButton = document.createElement("button");
         tabButton.setAttribute("class", "tablinks");
         tabButton.innerHTML = "Order# " + (i + 1);
-        const od = 'od' + '' + (i + 1) + ''; 
+        const od = 'od' + '' + (i + 1) + '';
         if (i == 0) {
             tabButton.setAttribute("id", "defaultOpen");
         }
@@ -200,7 +200,7 @@
         sta.appendChild(document.createTextNode("Status: " + parseR[i][0].stat));
         var time = document.createElement("P");
         time.setAttribute("class", "lead");
-        time.appendChild(document.createTextNode("Total Time: " + parseR[i][0].totalTime));
+        time.appendChild(document.createTextNode("Total Time: " + parseR[i][0].totalTime + ' mins'));
         var price = document.createElement("P");
         price.setAttribute("class", "lead");
         price.appendChild(document.createTextNode("Total Price: $" + parseR[i][0].price));
@@ -220,7 +220,7 @@
         content.appendChild(info);
         document.getElementById("tabcontainer").appendChild(content);
      }
- 
+
     function openCity(evt, cityName) {
         //alert(cityName);
         var i, tabcontent, tablinks;

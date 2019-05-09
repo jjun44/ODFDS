@@ -535,7 +535,6 @@ module.exports.addUser = function (req, res) {
       else {
         console.log('\nInserting user info into the db done successfully.\n');
         return res.redirect('/');
-        //res.render('index');
       }
     })
   }

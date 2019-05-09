@@ -242,7 +242,7 @@ module.exports.addUser = function (req, res) {
     /**
       This method will be responsible for validatig each field in the signup page.
 
-    **/ 
+    **/
     function validateEntries() {
     // Password Checking
     if (pwd.length < 4) {
@@ -253,7 +253,7 @@ module.exports.addUser = function (req, res) {
         return;
       }
       else {
-        errorMessage = "Error: Password must be at least 4 characters"; 
+        errorMessage = "Error: Password must be at least 4 characters";
         res.render('driverSignup', {errorM: errorMessage });
         return;
       }
@@ -276,7 +276,7 @@ module.exports.addUser = function (req, res) {
 
     // Checkpoint in console.
     console.log("Password Verified");
-  
+
     if (name.length == 0) {
       console.log("Name not inputted \n");
       errorMessage = "Enter a name.";
@@ -347,7 +347,6 @@ module.exports.addUser = function (req, res) {
       else {
         console.log('\nInserting user info into the db done successfully.\n');
         return res.redirect('/');
-        //res.render('index');
       }
     })
   }
