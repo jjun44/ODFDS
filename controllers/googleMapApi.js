@@ -24,6 +24,11 @@ module.exports.calcRoute = function (start, end, callback) {
         else {
           var distance = results.json.routes[0].legs[0].distance.text;
           var duration = results.json.routes[0].legs[0].duration.text;
+          // If distance is in ft, convert it to miles.
+          var distInFt = distance.split(' ');
+          if (distInFt[1] == 'ft') {
+             distance = (distInFt[0] * 0.000189394).toFixed(5) + ' mi';
+          }
           callback(distance, duration);
         }
     });
