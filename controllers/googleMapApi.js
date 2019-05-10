@@ -11,8 +11,15 @@ var googleMapsClient = require('@google/maps').createClient({
 });
 var inOneHour = Math.round((new Date().getTime() + 60 * 60 * 1000)/1000);
 
+/**
+ * Calculate distance and estimated time
+ * from location A to B using Google Map API.
+ * @param {string} start start location
+ * @param {string} end end location
+ * @param {function} callback function to call after calculating
+ */
 module.exports.calcRoute = function (start, end, callback) {
-  console.log("Calculating route...");
+  //console.log("Calculating route...");
   googleMapsClient.directions({
       origin: start,
       destination: end,
@@ -20,8 +27,9 @@ module.exports.calcRoute = function (start, end, callback) {
       mode: 'driving',
       traffic_model: 'best_guess'
     }, function(err, results) {
-        if (err) { console.log("Calculating route failed.."); }
-        else {
+        if (err) {
+          console.log("calcRoute failed..");
+        } else {
           var distance = results.json.routes[0].legs[0].distance.text;
           var duration = results.json.routes[0].legs[0].duration.text;
           // If distance is in ft, convert it to miles.
@@ -32,6 +40,24 @@ module.exports.calcRoute = function (start, end, callback) {
           callback(distance, duration);
         }
     });
+}
+
+/**
+ * Geocode an address into lat/lng usign Google Map API.
+ * @param {string} addr address to geocode
+ * @param {function} callback function to call after calculating
+ */
+module.exports.geoCode = function (addr, callback) {
+  //console.log("Geocoding address...");
+  googleMapsClient.geocode({address: addr}, function(err, response) {
+    if (err) {
+       console.log("geoCode failed...");
+    } else {
+       const lat = response.json.results[0].geometry.location.lat;
+       const lng = response.json.results[0].geometry.location.lng;
+       callback(lat, lng);
+     }
+  });
 }
 
 module.exports.mapClient = googleMapsClient;

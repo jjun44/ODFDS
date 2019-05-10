@@ -301,7 +301,7 @@ module.exports.addUser = function (req, res) {
 
     if (phone.length == 0 || phone.length != 10) {
       console.log("Invalid phone number. \n");
-      errorMessage = "Enter a valid Phone number: (1234567890)";
+      errorMessage = "Phone number must be 10 digits long.";
       res.render('driverSignup', {errorM: errorMessage });
       return;
     }
@@ -311,7 +311,7 @@ module.exports.addUser = function (req, res) {
 
     if (bank.length == 0 || bank.length != 16) {
       console.log("no bank input \n");
-      errorMessage = "bank account must be 16 digits long.";
+      errorMessage = "Bank account must be 16 digits long.";
       res.render('driverSignup', {errorM: errorMessage });
       return;
     }

@@ -347,12 +347,7 @@ module.exports.addUser = function (req, res) {
   const addr  = req.body.address;
   const phone  = req.body.phone;
   const creditCard = req.body.creditCard;
-  // Insert data into tables;
-  var sql, value;
   validateEmail();
-
-
-
 
     /**
       This function will be responsible for checking of the email; needed to be separate from all the checks
@@ -467,7 +462,7 @@ module.exports.addUser = function (req, res) {
 
     if (phone.length == 0 || phone.length != 10) {
       console.log("Invalid phone number. \n");
-      errorMessage = "Enter a valid Phone number: (1234567890)";
+      errorMessage = "Phone number must be 10 digits long.";
       res.render('restaurantSignup', {errorM: errorMessage });
       return;
     }
@@ -493,8 +488,8 @@ module.exports.addUser = function (req, res) {
    * Insert user information into User table.
    */
   function addUserInfo() {
-    sql = 'INSERT into User (Email, Password, Type) VALUE(?, ?, ?);';
-    value = [email, pwd, 'Restaurant'];
+    var sql = 'INSERT into User (Email, Password, Type) VALUE(?, ?, ?);';
+    var value = [email, pwd, 'Restaurant'];
     conn.query(sql, value, function (err, result) {
       if (err) { console.log('Inserting to User Failed'); }
       else     { addLocation(result.insertId); }
@@ -506,19 +501,17 @@ module.exports.addUser = function (req, res) {
    * @param {integer} userId auto-generated user ID
    */
   function addLocation(userId) {
-    sql = 'INSERT INTO Location (Latitude, Longitude) VALUE(?, ?);';
-    // Convert address into latitude and Longitude
-    googleMap.mapClient.geocode({address: addr}, function(err, response) {
-       if (!err) {
-         const lat = response.json.results[0].geometry.location.lat;
-         const lng = response.json.results[0].geometry.location.lng;
-         const value = [lat, lng];
-         conn.query(sql, value, function (err, result) {
-           if (err) { console.log('Inserting to Location Failed'); }
-           else     { addRestaurant(userId, result.insertId); }
-         })
-       }
-     });
+    var sql = 'INSERT INTO Location (Latitude, Longitude) VALUE(?, ?);';
+    // Add convered lat/lng into Location table.
+    var addLatLng = function (lat, lng) {
+      var value = [lat, lng];
+      conn.query(sql, value, function (err, result) {
+        if (err) { console.log('Inserting to Location Failed'); }
+        else     { addRestaurant(userId, result.insertId); }
+      });
+    }
+     // Convert address into latitude and Longitude
+     googleMap.geoCode(addr, addLatLng);
   }
   /**
    * Inserts restuarnt info into Restaurant table
@@ -527,13 +520,13 @@ module.exports.addUser = function (req, res) {
    * @param {integer} locId auto-generated location ID
    */
   function addRestaurant(userId, locId) {
-    sql = 'INSERT INTO Restaurant (uId, Name, Address, LocationID, \
+    var sql = 'INSERT INTO Restaurant (uId, Name, Address, LocationID, \
                     Phone, CreditCard) VALUE(?, ?, ?, ?, ?, ?);';
-    value = [userId, name, addr, locId, phone, creditCard];
+    var value = [userId, name, addr, locId, phone, creditCard];
     conn.query(sql, value, function (err, result) {
       if (err) { console.log('Inserting to Restaurant Failed'); }
       else {
-        console.log('\nInserting user info into the db done successfully.\n');
+        console.log('Inserting user info into the db done successfully.');
         return res.redirect('/');
       }
     })
