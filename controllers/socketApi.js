@@ -128,10 +128,13 @@ socketApi.sendRouteInfo = function(rID, rName, rAddr, dest, order, driver, res) 
   //setTimeout(this.sendRouteInfo, 20 * 60 * 1000)
   setTimeout(function() {
     setTimeout(function() {
+      setTimeout(function() {
+        socketApi.sendMsg("Coulnd't find a driver.. Please request again.");
+      }, 100);
       res.redirect('/rest/request');
-    }, 5);
+    }, 1);
     this.sendRouteInfo;
-  }, 10 * 60 * 1000);
+  }, 1 * 60 * 1000);
 }
 
 /**

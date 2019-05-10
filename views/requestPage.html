@@ -137,9 +137,14 @@
     <!-- Server will send the order and nearest driver information to the user dynamically -->
     <script src = "/socket.io/socket.io.js"></script>
     <script>
+    var socket = io();
+    /** Receives a message from the server. */
+    socket.on('msg', function(data) {
+      document.getElementById("msg").innerHTML = data.msg;
+      document.getElementById("findingDriver").style.visibility = 'hidden';
+    });
     function getResult() {
       document.getElementById("msg").innerHTML = '';
-      var socket = io();
       /** Sends restaurnt ID to the server. */
       socket.emit('saveUserInfo', 'R', document.getElementById('rID').innerHTML);
       /** Receives order infomration from the server. */
@@ -150,11 +155,6 @@
         document.getElementById("distance").innerHTML = data.distance;
         document.getElementById("time").innerHTML = data.duration;
         document.getElementById("price").innerHTML = '$' + data.price;
-      });
-      /** Receives a message from the server. */
-      socket.on('msg', function(data) {
-        document.getElementById("msg").innerHTML = data.msg;
-        document.getElementById("findingDriver").style.visibility = 'hidden';
       });
       /** Receives order ID from the server.  */
       socket.on('orderID', function(data) {
@@ -179,9 +179,9 @@
 						Request a Driver
 					</span>
             <br><br><br>
-            <p id="msg"></p>
+            <p id="msg" style="padding-bottom:10px;"></p>
             <div class="wrap-input100 validate-input" data-validate="Destination is required">
-                <span class="login50-form-title p-b-20">Enter the Destination</span>
+                <span class="label-input100">Enter the Destination:</span>
                 <input class="input100" type="text" id="destination" name="destination" placeholder="Destination...">
                 <span class="focus-input100"></span>
             </div>
@@ -217,8 +217,6 @@
               <p class="lead">Arrives in: <span id="arrivesIn"></span></p>
               <hr class="my-4"></div></div>
         </form>
-
-
         <p style="visibility:hidden;"><span id="lat">{{lat}}</span><span id="lng">{{lng}}</span></p>
       </div>
 </div>
