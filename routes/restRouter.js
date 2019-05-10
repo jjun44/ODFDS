@@ -9,6 +9,7 @@
 var express = require('express');
 var router = express.Router();
 const restCtrl = require("../controllers/restCtrl");
+const socketApi = require("../controllers/socketApi");
 
 /* Get request page */
 router.get('/request', function(req, res, next) {
@@ -20,7 +21,16 @@ router.get('/request', function(req, res, next) {
 });
 
 /* Post request page */
-router.post('/request', restCtrl.orderRequest);
+router.post('/request', function(req, res) {
+  restCtrl.orderRequest(req, res);
+  // after 5 mins of request, refresh the page with error message.
+  res.setTimeout(5 * 60 * 1000, function(){
+    setTimeout(function() {
+      socketApi.sendMsg("Time out! Please request again!");
+    }, 200);
+    res.redirect('/rest/request');
+  });
+});
 
 /* Get track page */
 router.get('/track', function(req, res, next) {

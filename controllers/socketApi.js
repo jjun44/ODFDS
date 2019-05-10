@@ -98,9 +98,7 @@ socketApi.trackRouteInfo = function(distance, duration) {
  * @param {string} errMsg error message.
  */
 socketApi.sendMsg = function(msg) {
-  //console.log("Sending msg to user");
   io.sockets.emit('msg', { msg: msg });
-  //console.log("Sending msg done");
 }
 
 /**
@@ -113,7 +111,7 @@ socketApi.sendMsg = function(msg) {
  * @param {Object} driver nearest driver information
  * @param {Object} res HTTP response
  */
-socketApi.sendRouteInfo = function(rID, rName, rAddr, dest, order, driver, res) {
+socketApi.sendRouteInfo = function(rID, rName, rAddr, dest, order, driver) {
   console.log("sendRouteInfo...");
   /* Send order information to restaurant users.  */
   io.sockets.emit('orderInfoToR', { rName: rName, rAddr: rAddr, dest: dest,
@@ -125,16 +123,6 @@ socketApi.sendRouteInfo = function(rID, rName, rAddr, dest, order, driver, res) 
                                       dID: driver.id, dName: driver.name, dPhone: driver.phone,
                                       distToRest: driver.distToRest, timeToRest: driver.timeToRest });
   }
-  //setTimeout(this.sendRouteInfo, 20 * 60 * 1000)
-  setTimeout(function() {
-    setTimeout(function() {
-      setTimeout(function() {
-        socketApi.sendMsg("Coulnd't find a driver.. Please request again.");
-      }, 100);
-      res.redirect('/rest/request');
-    }, 1);
-    this.sendRouteInfo;
-  }, 1 * 60 * 1000);
 }
 
 /**

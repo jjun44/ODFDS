@@ -84,7 +84,7 @@ module.exports.orderRequest = function (req, res) {
         });
         var orderInfo = new OrderInfo(distance, duration, price);
         // Send route information to the restaurant user.
-        socketApi.sendRouteInfo(rID, rName, rAddr, dest, orderInfo, null, res);
+        socketApi.sendRouteInfo(rID, rName, rAddr, dest, orderInfo, null);
         // If order is valid, find available drivers.
         findDrivers(orderInfo);
       }
@@ -180,7 +180,7 @@ module.exports.orderRequest = function (req, res) {
                 console.log(rID, rAddr, driverInfo.id, driverInfo.name,
                   driverInfo.phone, driverInfo.distToRest, driverInfo.timeToRest);
                 // Send route information to the corresponding driver.
-                socketApi.sendRouteInfo(rID, rName, rAddr, dest, orderInfo, driverInfo, res);
+                socketApi.sendRouteInfo(rID, rName, rAddr, dest, orderInfo, driverInfo);
               }
             }
             // Caluclate distance/duration from driver to restaurnt.
