@@ -449,7 +449,7 @@ module.exports.addUser = function (req, res) {
     console.log("Name is Verified \n");
 
 
-    /*          ################################################ License ######################################## */
+    /* ################################################ License ######################################## */
 
     if (addr.length == 0) {
       console.log("Invalid license ID. \n");

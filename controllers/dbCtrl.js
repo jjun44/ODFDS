@@ -19,13 +19,10 @@ function connectDatabase() {
             database: "ODFDS"
             */
 
-        	
             host: "localhost",
             user: "g3",
             password: "cs160G3!",
             database: 'ODFDS'
-            
-            
         });
         db.connect(function(err){
             if(!err) {

@@ -16,7 +16,7 @@ socketApi.io = io;
 
 io.on('connection', function(socket){
   /**
-   * Saves user information sent from the user.
+   * Saves online user information sent from the user.
    * @param {string} type user type either R (Restaurant) or D (Driver)
    * @param {string} userId user ID either rID or driverID
    */
@@ -94,8 +94,8 @@ socketApi.trackRouteInfo = function(distance, duration) {
 }
 
 /**
- * Sends an error message to users.
- * @param {string} errMsg error message.
+ * Sends a message to users.
+ * @param {string} msg message to send to the user
  */
 socketApi.sendMsg = function(msg) {
   io.sockets.emit('msg', { msg: msg });
