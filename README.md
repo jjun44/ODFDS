@@ -1,4 +1,5 @@
-# CS 160: On-Demand Food Delivery Service Project
+# ODFDS
+ODFDS is an on-demand food delivery service system which provides services that allow restaurnat users to deliver their take out orders in 30 mintues. Please see "ODFDSUserGuid.pdf" for the details of usage. 
 
 # Install
 Please see ODFDSUserGuide.pdf. 
